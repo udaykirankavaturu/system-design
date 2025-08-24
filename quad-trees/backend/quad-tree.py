@@ -132,32 +132,3 @@ class QuadTree:
     def _check_and_collapse_children_after_delete(self):
         if not self.points and self.divided and self._are_children_empty():
             self._collapse_children()
-
-# Usage example for Hyderabad
-
-hyderabad_boundary = Rectangle(x=78.5, y=17.4, w=0.25, h=0.25)
-qt = QuadTree(hyderabad_boundary, 4)
-
-drivers = [
-    Point(78.48, 17.42),
-    Point(78.52, 17.46),
-    Point(78.49, 17.38),
-    Point(78.53, 17.41),
-    Point(78.47, 17.44)
-]
-
-for d in drivers:
-    qt.insert(d)
-
-# Search drivers near a rider
-query_region = Rectangle(x=78.50, y=17.40, w=0.05, h=0.05)
-found_drivers = []
-qt.query(query_region, found_drivers)
-print("Nearby drivers before delete:", found_drivers)
-
-# Delete a driver
-qt.delete(Point(78.49, 17.38))
-
-found_drivers_after_delete = []
-qt.query(query_region, found_drivers_after_delete)
-print("Nearby drivers after delete:", found_drivers_after_delete)
