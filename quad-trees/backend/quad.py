@@ -132,3 +132,23 @@ class QuadTree:
     def _check_and_collapse_children_after_delete(self):
         if not self.points and self.divided and self._are_children_empty():
             self._collapse_children()
+
+    def to_dict(self):
+        node_data = {
+            "boundary": {
+                "x": self.boundary.x,
+                "y": self.boundary.y,
+                "w": self.boundary.w,
+                "h": self.boundary.h
+            },
+            "points": [{"longitude": p.x, "latitude": p.y} for p in self.points],
+            "divided": self.divided
+        }
+        if self.divided:
+            node_data["children"] = {
+                "northeast": self.northeast.to_dict() if self.northeast else None,
+                "northwest": self.northwest.to_dict() if self.northwest else None,
+                "southeast": self.southeast.to_dict() if self.southeast else None,
+                "southwest": self.southwest.to_dict() if self.southwest else None,
+            }
+        return node_data

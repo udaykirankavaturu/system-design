@@ -133,9 +133,20 @@ curl -X DELETE "http://127.0.0.1:8000/points/"
      -d '{"longitude": 78.49, "latitude": 17.38}'
 ```
 
+#### `GET /quadtree/visualize/`
+
+Returns a JSON representation of the current QuadTree structure for visualization.
+
+- **Response:** A nested JSON object representing the QuadTree, including boundaries, points, and children nodes.
+
+**cURL Example:**
+```bash
+curl -X GET "http://127.0.0.1:8000/quadtree/visualize/"
+```
+
 ## Usage Examples
 
-Let\'s add some example nodes in Hyderabad city and then perform a search operation.
+Let\\'s add some example nodes in Hyderabad city and then perform a search operation.
 
 ### 1. Insert Example Points (Hyderabad Landmarks)
 

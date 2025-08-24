@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict, Optional
 
 # Import the QuadTree implementation from your file
 from quad import Point, Rectangle, QuadTree
@@ -19,6 +19,19 @@ class RectangleModel(BaseModel):
     # Half-width and half-height
     w: float
     h: float
+
+# New Pydantic models for visualization
+class BoundaryModel(BaseModel):
+    x: float
+    y: float
+    w: float
+    h: float
+
+class QuadTreeNodeModel(BaseModel):
+    boundary: BoundaryModel
+    points: List[PointModel]
+    divided: bool
+    children: Optional[Dict[str, 'QuadTreeNodeModel']] = None # Recursive reference
 
 # --- FastAPI App Initialization ---
 
@@ -76,3 +89,11 @@ def delete_point(point: PointModel):
             detail="Point not found in the QuadTree."
         )
     return {"message": "Point deleted successfully."}
+
+# New API endpoint for QuadTree visualization
+@app.get("/quadtree/visualize/", response_model=QuadTreeNodeModel, tags=["QuadTree"])
+def visualize_quadtree():
+    """
+    Returns a JSON representation of the current QuadTree structure for visualization.
+    """
+    return quad_tree.to_dict()
