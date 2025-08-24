@@ -80,6 +80,7 @@ Represents a rectangular area for search queries.
   "h": 0.0
 }
 ```
+
 - `x`, `y`: Center coordinates of the rectangle.
 - `w`, `h`: Half-width and half-height of the rectangle.
 
@@ -92,10 +93,11 @@ Inserts a new geographical point into the QuadTree.
 - **Request Body:** `PointModel`
 - **Response:** `PointModel` of the inserted point.
 - **Status Codes:**
-    - `201 Created`: Point successfully inserted.
-    - `400 Bad Request`: Point is outside the defined QuadTree boundary.
+  - `201 Created`: Point successfully inserted.
+  - `400 Bad Request`: Point is outside the defined QuadTree boundary.
 
 **cURL Example:**
+
 ```bash
 curl -X POST "http://127.0.0.1:8000/points/"
      -H "Content-Type: application/json"
@@ -110,6 +112,7 @@ Searches for points within a given rectangular range.
 - **Response:** `List[PointModel]` containing all points found within the specified range.
 
 **cURL Example:**
+
 ```bash
 curl -X POST "http://127.0.0.1:8000/points/search/"
      -H "Content-Type: application/json"
@@ -123,10 +126,11 @@ Deletes a geographical point from the QuadTree.
 - **Request Body:** `PointModel`
 - **Response:** `{"message": "Point deleted successfully."}` on success.
 - **Status Codes:**
-    - `200 OK`: Point successfully deleted.
-    - `404 Not Found`: Point not found in the QuadTree.
+  - `200 OK`: Point successfully deleted.
+  - `404 Not Found`: Point not found in the QuadTree.
 
 **cURL Example:**
+
 ```bash
 curl -X DELETE "http://127.0.0.1:8000/points/"
      -H "Content-Type: application/json"
@@ -140,6 +144,7 @@ Returns a JSON representation of the current QuadTree structure for visualizatio
 - **Response:** A nested JSON object representing the QuadTree, including boundaries, points, and children nodes.
 
 **cURL Example:**
+
 ```bash
 curl -X GET "http://127.0.0.1:8000/quadtree/visualize/"
 ```
@@ -152,11 +157,11 @@ Let\\'s add some example nodes in Hyderabad city and then perform a search opera
 
 Here are a few famous landmarks in Hyderabad with their approximate longitude and latitude.
 
-- **Charminar:** Longitude: 78.4747, Latitude: 17.3616
-- **Golconda Fort:** Longitude: 78.4018, Latitude: 17.3800
-- **Hitech City:** Longitude: 78.3833, Latitude: 17.4486
-- **Gachibowli:** Longitude: 78.3433, Latitude: 17.4486
-- **Secunderabad Railway Station:** Longitude: 78.5000, Latitude: 17.4399
+- **Charminar:** 17.3616, 78.4747
+- **Golconda Fort:** 17.3800, 78.4018
+- **Hitech City:** 17.4486, 78.3833
+- **Gachibowli:** 17.4486, 78.3433
+- **Secunderabad Railway Station:** 17.4399, 78.5000
 
 You can insert these points using the following `curl` commands:
 
@@ -192,6 +197,7 @@ curl -X POST "http://127.0.0.1:8000/points/" \
 Now, let\'s search for points within a rectangular area that covers some of the inserted points. For example, a search around the central-western part of Hyderabad, which might include Golconda Fort, Hitech City, and Gachibowli.
 
 Let\'s define a search rectangle:
+
 - **Center (x, y):** 78.39, 17.41 (roughly between Golconda and Hitech City)
 - **Half-width (w):** 0.08 (covers a range of 0.16 longitude)
 - **Half-height (h):** 0.05 (covers a range of 0.10 latitude)
