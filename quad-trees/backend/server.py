@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List
 
 # Import the QuadTree implementation from your file
-from quad_tree import Point, Rectangle, QuadTree
+from quad import Point, Rectangle, QuadTree
 
 # --- Pydantic Models for API data validation ---
 
