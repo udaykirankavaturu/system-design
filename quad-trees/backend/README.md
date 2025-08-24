@@ -199,8 +199,8 @@ Now, let\'s search for points within a rectangular area that covers some of the 
 Let\'s define a search rectangle:
 
 - **Center (x, y):** 78.39, 17.41 (roughly between Golconda and Hitech City)
-- **Half-width (w):** 0.08 (covers a range of 0.16 longitude)
-- **Half-height (h):** 0.05 (covers a range of 0.10 latitude)
+- **Half-width (w):** 0.047 (about 10 km width)
+- **Half-height (h):** 0.045 (about 10 km height)
 
 This rectangle would cover longitudes from `78.31` to `78.47` and latitudes from `17.36` to `17.46`.
 
