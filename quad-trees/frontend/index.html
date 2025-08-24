@@ -27,6 +27,7 @@
 <body>
     <div class="container">
         <h1 class="mb-4">QuadTree API Client</h1>
+        <div id="feedbackMessage" class="alert" role="alert" style="display: none;"></div>
 
         <!-- Insert Point Section -->
         <div class="card">
@@ -117,6 +118,10 @@
         const API_BASE_URL = 'http://127.0.0.1:8000'; // Your FastAPI backend URL
 
         async function callApi(endpoint, method, data = null) {
+            const feedbackDiv = document.getElementById('feedbackMessage');
+            feedbackDiv.style.display = 'none'; // Hide previous messages
+            feedbackDiv.classList.remove('alert-success', 'alert-danger'); // Clear previous styles
+
             const options = {
                 method: method,
                 headers: {
@@ -131,8 +136,21 @@
                 const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
                 const result = await response.json();
                 document.getElementById('apiResponse').textContent = JSON.stringify(result, null, 2);
+
+                if (response.ok) {
+                    feedbackDiv.textContent = `Success: ${method} ${endpoint} - ${response.status}`;
+                    feedbackDiv.classList.add('alert-success');
+                } else {
+                    feedbackDiv.textContent = `Error: ${method} ${endpoint} - ${response.status} - ${result.detail || JSON.stringify(result)}`;
+                    feedbackDiv.classList.add('alert-danger');
+                }
+                feedbackDiv.style.display = 'block'; // Show the message
+
             } catch (error) {
                 document.getElementById('apiResponse').textContent = `Error: ${error.message}`;
+                feedbackDiv.textContent = `Network Error: ${error.message}`;
+                feedbackDiv.classList.add('alert-danger');
+                feedbackDiv.style.display = 'block'; // Show the message
                 console.error('API call error:', error);
             }
         }

@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Optional
+from fastapi.middleware.cors import CORSMiddleware
 
 # Import the QuadTree implementation from your file
 from quad import Point, Rectangle, QuadTree
@@ -39,6 +40,14 @@ app = FastAPI(
     title="QuadTree API",
     description="An API to interact with a QuadTree for geospatial data.",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, PUT, DELETE, OPTIONS)
+    allow_headers=["*"],  # Allows all headers
 )
 
 # --- Global QuadTree Instance ---
