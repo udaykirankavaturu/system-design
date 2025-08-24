@@ -146,11 +146,22 @@
                 }
                 feedbackDiv.style.display = 'block'; // Show the message
 
+                // Hide the message after 3 seconds
+                setTimeout(() => {
+                    feedbackDiv.style.display = 'none';
+                }, 3000); // 3000 milliseconds = 3 seconds
+
             } catch (error) {
                 document.getElementById('apiResponse').textContent = `Error: ${error.message}`;
                 feedbackDiv.textContent = `Network Error: ${error.message}`;
                 feedbackDiv.classList.add('alert-danger');
                 feedbackDiv.style.display = 'block'; // Show the message
+
+                // Hide the message after 3 seconds
+                setTimeout(() => {
+                    feedbackDiv.style.display = 'none';
+                }, 3000); // 3000 milliseconds = 3 seconds
+
                 console.error('API call error:', error);
             }
         }
