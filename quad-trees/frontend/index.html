@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuadTree API Client</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">QuadTree API Client</h1>
+
+        <!-- Insert Point Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Insert Point (POST /points/)</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="insertLongitude" class="form-label">Longitude:</label>
+                    <input type="number" class="form-control" id="insertLongitude" value="78.48" step="0.0001">
+                </div>
+                <div class="mb-3">
+                    <label for="insertLatitude" class="form-label">Latitude:</label>
+                    <input type="number" class="form-control" id="insertLatitude" value="17.42" step="0.0001">
+                </div>
+                <button class="btn btn-primary" onclick="insertPoint()">Insert Point</button>
+            </div>
+        </div>
+
+        <!-- Search Points Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Search Points (POST /points/search/)</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="searchX" class="form-label">Center X (Longitude):</label>
+                    <input type="number" class="form-control" id="searchX" value="78.39" step="0.0001">
+                </div>
+                <div class="mb-3">
+                    <label for="searchY" class="form-label">Center Y (Latitude):</label>
+                    <input type="number" class="form-control" id="searchY" value="17.41" step="0.0001">
+                </div>
+                <div class="mb-3">
+                    <label for="searchW" class="form-label">Half-Width (W):</label>
+                    <input type="number" class="form-control" id="searchW" value="0.08" step="0.0001">
+                </div>
+                <div class="mb-3">
+                    <label for="searchH" class="form-label">Half-Height (H):</label>
+                    <input type="number" class="form-control" id="searchH" value="0.05" step="0.0001">
+                </div>
+                <button class="btn btn-primary" onclick="searchPoints()">Search Points</button>
+            </div>
+        </div>
+
+        <!-- Delete Point Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Delete Point (DELETE /points/)</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="deleteLongitude" class="form-label">Longitude:</label>
+                    <input type="number" class="form-control" id="deleteLongitude" value="78.4747" step="0.0001">
+                </div>
+                <div class="mb-3">
+                    <label for="deleteLatitude" class="form-label">Latitude:</label>
+                    <input type="number" class="form-control" id="deleteLatitude" value="17.3616" step="0.0001">
+                </div>
+                <button class="btn btn-danger" onclick="deletePoint()">Delete Point</button>
+            </div>
+        </div>
+
+        <!-- Visualize QuadTree Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Visualize QuadTree (GET /quadtree/visualize/)</h3>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-info" onclick="visualizeQuadTree()">Visualize QuadTree</button>
+            </div>
+        </div>
+
+        <!-- API Response Display -->
+        <div class="card">
+            <div class="card-header">
+                <h3>API Response</h3>
+            </div>
+            <div class="card-body">
+                <pre id="apiResponse"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (optional, for components that need it) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000'; // Your FastAPI backend URL
+
+        async function callApi(endpoint, method, data = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                const result = await response.json();
+                document.getElementById('apiResponse').textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('apiResponse').textContent = `Error: ${error.message}`;
+                console.error('API call error:', error);
+            }
+        }
+
+        function insertPoint() {
+            const longitude = parseFloat(document.getElementById('insertLongitude').value);
+            const latitude = parseFloat(document.getElementById('insertLatitude').value);
+            callApi('/points/', 'POST', { longitude, latitude });
+        }
+
+        function searchPoints() {
+            const x = parseFloat(document.getElementById('searchX').value);
+            const y = parseFloat(document.getElementById('searchY').value);
+            const w = parseFloat(document.getElementById('searchW').value);
+            const h = parseFloat(document.getElementById('searchH').value);
+            callApi('/points/search/', 'POST', { x, y, w, h });
+        }
+
+        function deletePoint() {
+            const longitude = parseFloat(document.getElementById('deleteLongitude').value);
+            const latitude = parseFloat(document.getElementById('deleteLatitude').value);
+            callApi('/points/', 'DELETE', { longitude, latitude });
+        }
+
+        function visualizeQuadTree() {
+            callApi('/quadtree/visualize/', 'GET');
+        }
+    </script>
+</body>
+</html>
