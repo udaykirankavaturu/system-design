@@ -132,3 +132,77 @@ curl -X DELETE "http://127.0.0.1:8000/points/"
      -H "Content-Type: application/json"
      -d '{"longitude": 78.49, "latitude": 17.38}'
 ```
+
+## Usage Examples
+
+Let\'s add some example nodes in Hyderabad city and then perform a search operation.
+
+### 1. Insert Example Points (Hyderabad Landmarks)
+
+Here are a few famous landmarks in Hyderabad with their approximate longitude and latitude.
+
+- **Charminar:** Longitude: 78.4747, Latitude: 17.3616
+- **Golconda Fort:** Longitude: 78.4018, Latitude: 17.3800
+- **Hitech City:** Longitude: 78.3833, Latitude: 17.4486
+- **Gachibowli:** Longitude: 78.3433, Latitude: 17.4486
+- **Secunderabad Railway Station:** Longitude: 78.5000, Latitude: 17.4399
+
+You can insert these points using the following `curl` commands:
+
+```bash
+# Insert Charminar
+curl -X POST "http://127.0.0.1:8000/points/" \
+     -H "Content-Type: application/json" \
+     -d '{"longitude": 78.4747, "latitude": 17.3616}'
+
+# Insert Golconda Fort
+curl -X POST "http://127.0.0.1:8000/points/" \
+     -H "Content-Type: application/json" \
+     -d '{"longitude": 78.4018, "latitude": 17.3800}'
+
+# Insert Hitech City
+curl -X POST "http://127.0.0.1:8000/points/" \
+     -H "Content-Type: application/json" \
+     -d '{"longitude": 78.3833, "latitude": 17.4486}'
+
+# Insert Gachibowli
+curl -X POST "http://127.0.0.1:8000/points/" \
+     -H "Content-Type: application/json" \
+     -d '{"longitude": 78.3433, "latitude": 17.4486}'
+
+# Insert Secunderabad Railway Station
+curl -X POST "http://127.0.0.1:8000/points/" \
+     -H "Content-Type: application/json" \
+     -d '{"longitude": 78.5000, "latitude": 17.4399}'
+```
+
+### 2. Search for Points within a Range
+
+Now, let\'s search for points within a rectangular area that covers some of the inserted points. For example, a search around the central-western part of Hyderabad, which might include Golconda Fort, Hitech City, and Gachibowli.
+
+Let\'s define a search rectangle:
+- **Center (x, y):** 78.39, 17.41 (roughly between Golconda and Hitech City)
+- **Half-width (w):** 0.08 (covers a range of 0.16 longitude)
+- **Half-height (h):** 0.05 (covers a range of 0.10 latitude)
+
+This rectangle would cover longitudes from `78.31` to `78.47` and latitudes from `17.36` to `17.46`.
+
+```bash
+# Search for points in a specific area
+curl -X POST "http://127.0.0.1:8000/points/search/" \
+     -H "Content-Type: application/json" \
+     -d '{"x": 78.39, "y": 17.41, "w": 0.08, "h": 0.05}'
+```
+
+This search should return Golconda Fort, Hitech City, and Gachibowli, as their coordinates fall within this range.
+
+### 3. Delete an Example Point
+
+You can also delete a specific point. For instance, to delete Charminar:
+
+```bash
+# Delete Charminar
+curl -X DELETE "http://127.0.0.1:8000/points/" \
+     -H "Content-Type: application/json" \
+     -d '{"longitude": 78.4747, "latitude": 17.3616}'
+```
