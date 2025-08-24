@@ -22,6 +22,19 @@
             border-radius: 5px;
             overflow-x: auto;
         }
+        .quadtree-node {
+            position: absolute;
+            border: 1px solid rgba(0, 0, 0, 0.2); /* Light border for nodes */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        .quadtree-point {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: red;
+            border-radius: 50%;
+            transform: translate(-50%, -50%); /* Center the point */
+        }
     </style>
 </head>
 <body>
@@ -42,6 +55,10 @@
                 <div class="mb-3">
                     <label for="insertLatitude" class="form-label">Latitude:</label>
                     <input type="number" class="form-control" id="insertLatitude" value="17.42" step="0.0001">
+                </div>
+                <div class="mb-3">
+                    <label for="insertLabel" class="form-label">Label (Optional):</label>
+                    <input type="text" class="form-control" id="insertLabel" placeholder="e.g., Charminar">
                 </div>
                 <button class="btn btn-primary" onclick="insertPoint()">Insert Point</button>
             </div>
@@ -87,6 +104,10 @@
                     <label for="deleteLatitude" class="form-label">Latitude:</label>
                     <input type="number" class="form-control" id="deleteLatitude" value="17.3616" step="0.0001">
                 </div>
+                <div class="mb-3">
+                    <label for="deleteLabel" class="form-label">Label (Optional):</label>
+                    <input type="text" class="form-control" id="deleteLabel" placeholder="e.g., Charminar">
+                </div>
                 <button class="btn btn-danger" onclick="deletePoint()">Delete Point</button>
             </div>
         </div>
@@ -108,6 +129,18 @@
             </div>
             <div class="card-body">
                 <pre id="apiResponse"></pre>
+            </div>
+        </div>
+
+        <!-- QuadTree Visualization Display -->
+        <div class="card">
+            <div class="card-header">
+                <h3>QuadTree Visualization</h3>
+            </div>
+            <div class="card-body">
+                <div id="quadTreeVisualization" style="position: relative; border: 1px solid black; width: 800px; height: 400px; margin: auto; overflow: hidden;">
+                    <!-- QuadTree nodes and points will be rendered here -->
+                </div>
             </div>
         </div>
     </div>
@@ -166,10 +199,78 @@
             }
         }
 
+        // Constants for visualization scaling
+        const VIS_WIDTH = 800; // Width of the visualization area in pixels
+        const VIS_HEIGHT = 400; // Height of the visualization area in pixels
+        const WORLD_LONGITUDE_RANGE = 360; // -180 to +180
+        const WORLD_LATITUDE_RANGE = 180; // -90 to +90
+
+        // Calculate scaling factors
+        const SCALE_X = VIS_WIDTH / WORLD_LONGITUDE_RANGE;
+        const SCALE_Y = VIS_HEIGHT / WORLD_LATITUDE_RANGE;
+
+        function renderQuadTree(quadTreeData, parentElement) {
+            if (!quadTreeData) return;
+
+            const boundary = quadTreeData.boundary;
+            const points = quadTreeData.points;
+            const divided = quadTreeData.divided;
+
+            // Calculate pixel coordinates and dimensions for the node's boundary
+            // Convert longitude/latitude to pixel coordinates (top-left corner)
+            const pixelX = (boundary.x - boundary.w + WORLD_LONGITUDE_RANGE / 2) * SCALE_X;
+            const pixelY = (WORLD_LATITUDE_RANGE / 2 - (boundary.y + boundary.h)) * SCALE_Y; // Invert Y-axis for CSS top
+
+            const pixelWidth = boundary.w * 2 * SCALE_X;
+            const pixelHeight = boundary.h * 2 * SCALE_Y;
+
+            const nodeDiv = document.createElement('div');
+            nodeDiv.className = 'quadtree-node';
+            nodeDiv.style.left = `${pixelX}px`;
+            nodeDiv.style.top = `${pixelY}px`;
+            nodeDiv.style.width = `${pixelWidth}px`;
+            nodeDiv.style.height = `${pixelHeight}px`;
+
+            parentElement.appendChild(nodeDiv);
+
+            // Render points within this node
+            points.forEach(p => {
+                const pointDiv = document.createElement('div');
+                pointDiv.className = 'quadtree-point';
+                // Calculate point position relative to the visualization container
+                const pointPixelX = (p.longitude + WORLD_LONGITUDE_RANGE / 2) * SCALE_X;
+                const pointPixelY = (WORLD_LATITUDE_RANGE / 2 - p.latitude) * SCALE_Y; // Invert Y-axis for CSS top
+
+                pointDiv.style.left = `${pointPixelX}px`;
+                pointDiv.style.top = `${pointPixelY}px`;
+
+                if (p.label) { // Display label if it exists
+                    const labelSpan = document.createElement('span');
+                    labelSpan.textContent = p.label;
+                    labelSpan.style.position = 'absolute';
+                    labelSpan.style.whiteSpace = 'nowrap';
+                    labelSpan.style.fontSize = '10px';
+                    labelSpan.style.transform = 'translate(10px, -50%)'; // Offset label from point
+                    pointDiv.appendChild(labelSpan);
+                }
+
+                nodeDiv.appendChild(pointDiv); // Append points to their respective node div
+            });
+
+            // Recursively render children if divided
+            if (divided && quadTreeData.children) {
+                renderQuadTree(quadTreeData.children.northeast, nodeDiv);
+                renderQuadTree(quadTreeData.children.northwest, nodeDiv);
+                renderQuadTree(quadTreeData.children.southeast, nodeDiv);
+                renderQuadTree(quadTreeData.children.southwest, nodeDiv);
+            }
+        }
+
         function insertPoint() {
             const longitude = parseFloat(document.getElementById('insertLongitude').value);
             const latitude = parseFloat(document.getElementById('insertLatitude').value);
-            callApi('/points/', 'POST', { longitude, latitude });
+            const label = document.getElementById('insertLabel').value;
+            callApi('/points/', 'POST', { longitude, latitude, label: label || null });
         }
 
         function searchPoints() {
@@ -183,11 +284,48 @@
         function deletePoint() {
             const longitude = parseFloat(document.getElementById('deleteLongitude').value);
             const latitude = parseFloat(document.getElementById('deleteLatitude').value);
-            callApi('/points/', 'DELETE', { longitude, latitude });
+            const label = document.getElementById('deleteLabel').value;
+            callApi('/points/', 'DELETE', { longitude, latitude, label: label || null });
         }
 
-        function visualizeQuadTree() {
-            callApi('/quadtree/visualize/', 'GET');
+        async function visualizeQuadTree() {
+            const feedbackDiv = document.getElementById('feedbackMessage');
+            feedbackDiv.style.display = 'none';
+            feedbackDiv.classList.remove('alert-success', 'alert-danger');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/quadtree/visualize/`, { method: 'GET' });
+                const result = await response.json();
+                document.getElementById('apiResponse').textContent = JSON.stringify(result, null, 2);
+
+                if (response.ok) {
+                    feedbackDiv.textContent = `Success: GET /quadtree/visualize/ - ${response.status}`;
+                    feedbackDiv.classList.add('alert-success');
+
+                    // Clear previous visualization
+                    const visContainer = document.getElementById('quadTreeVisualization');
+                    visContainer.innerHTML = '';
+
+                    // Render the QuadTree
+                    renderQuadTree(result, visContainer);
+
+                } else {
+                    feedbackDiv.textContent = `Error: GET /quadtree/visualize/ - ${response.status} - ${result.detail || JSON.stringify(result)}`;
+                    feedbackDiv.classList.add('alert-danger');
+                }
+                feedbackDiv.style.display = 'block';
+                setTimeout(() => { feedbackDiv.style.display = 'none'; }, 3000);
+
+            } catch (error) {
+                document.getElementById('apiResponse').textContent = `Error: ${error.message}`;
+                feedbackDiv.textContent = `Network Error: ${error.message}`;
+                feedbackDiv.classList.add('alert-danger');
+                feedbackDiv.style.display = 'block';
+                setTimeout(() => {
+                    feedbackDiv.style.display = 'none';
+                }, 3000);
+                console.error('API call error:', error);
+            }
         }
     </script>
 </body>

@@ -1,15 +1,18 @@
 from typing import List, Optional
 
 class Point:
-    def __init__(self, longitude, latitude):
+    def __init__(self, longitude, latitude, label=None):
         self.x = longitude
         self.y = latitude
+        self.label = label
         
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
     
     def __repr__(self):
-        return f"Point({self.x}, {self.y})"
+        if self.label:
+            return f"Point(label='{self.label}', x={self.x}, y={self.y})"
+        return f"Point(x={self.x}, y={self.y})"
         
 class Rectangle:
     def __init__(self, x, y, w, h):
@@ -93,8 +96,18 @@ class QuadTree:
         if not self.boundary.contains(point):
             return False
 
-        if point in self.points:
-            self.points.remove(point)
+        # Check if the point exists in this node's points, considering label if provided
+        found_in_this_node = False
+        for i, p in enumerate(self.points):
+            if p.x == point.x and p.y == point.y:
+                # If a label is provided in the point to delete, it must match
+                # Otherwise, if no label is provided, just match by coordinates
+                if point.label is None or p.label == point.label:
+                    self.points.pop(i)
+                    found_in_this_node = True
+                    break
+        
+        if found_in_this_node:
             # If this node is now empty, and its children are also empty, collapse them.
             if not self.points and self.divided and self._are_children_empty():
                 self._collapse_children()
@@ -141,7 +154,7 @@ class QuadTree:
                 "w": self.boundary.w,
                 "h": self.boundary.h
             },
-            "points": [{"longitude": p.x, "latitude": p.y} for p in self.points],
+            "points": [{"longitude": p.x, "latitude": p.y, "label": p.label} for p in self.points],
             "divided": self.divided
         }
         if self.divided:

@@ -12,6 +12,7 @@ from quad import Point, Rectangle, QuadTree
 class PointModel(BaseModel):
     longitude: float
     latitude: float
+    label: Optional[str] = None # Added label
 
 class RectangleModel(BaseModel):
     # Center of the rectangle
@@ -67,7 +68,7 @@ def insert_point(point: PointModel):
     """
     Inserts a new geographical point into the QuadTree.
     """
-    p = Point(point.longitude, point.latitude)
+    p = Point(point.longitude, point.latitude, point.label) # Pass label to Point constructor
     if not quad_tree.insert(p):
         raise HTTPException(
             status_code=400,
@@ -84,14 +85,14 @@ def search_points(range_rect: RectangleModel):
     found_points = []
     quad_tree.query(search_range, found_points)
     # Convert internal Point objects to Pydantic models for the response
-    return [{"longitude": p.x, "latitude": p.y} for p in found_points]
+    return [{"longitude": p.x, "latitude": p.y, "label": p.label} for p in found_points] # Include label
 
 @app.delete("/points/", status_code=200, tags=["Points"])
 def delete_point(point: PointModel):
     """
     Deletes a geographical point from the QuadTree.
     """
-    p = Point(point.longitude, point.latitude)
+    p = Point(point.longitude, point.latitude, point.label) # Pass label to Point constructor
     if not quad_tree.delete(p):
         raise HTTPException(
             status_code=404,
