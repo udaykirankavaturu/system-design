@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Concurrent OT Client</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        padding: 20px;
+      }
+      .user-col {
+        border-left: 1px solid #ddd;
+        padding-left: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <h1 class="mb-4">Concurrent Operational Transformation</h1>
+      <div id="feedbackMessage" class="alert" style="display: none"></div>
+
+      <div class="row">
+        <!-- Server Column -->
+        <div class="col-md-3">
+          <h3>Server State</h3>
+          <button class="btn btn-info mb-3" onclick="getDocument()">
+            Get Server Document
+          </button>
+          <button class="btn btn-danger mb-3" onclick="resetDocument()">
+            Reset Document
+          </button>
+          <pre id="serverState">Hello, world!</pre>
+        </div>
+
+        <!-- User Columns -->
+        <div class="col-md-9">
+          <div class="row">
+            <div class="col-md-4 user-col" id="user1">
+              <h4>User 1</h4>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="" id="user1-check" checked>
+                <label class="form-check-label" for="user1-check">
+                  Send to Server
+                </label>
+              </div>
+              <textarea class="form-control mb-2" rows="5">Hello, world!</textarea>
+              <div class="input-group mb-2">
+                <select class="form-select">
+                  <option value="insert">Insert</option>
+                  <option value="delete">Delete</option>
+                </select>
+                <input type="number" class="form-control" placeholder="Pos" value="7" />
+                <input type="text" class="form-control" placeholder="Text" value=" beautiful" />
+              </div>
+            </div>
+            <div class="col-md-4 user-col" id="user2">
+              <h4>User 2</h4>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="" id="user2-check" checked>
+                <label class="form-check-label" for="user2-check">
+                  Send to Server
+                </label>
+              </div>
+              <textarea class="form-control mb-2" rows="5">Hello, world!</textarea>
+              <div class="input-group mb-2">
+                <select class="form-select">
+                  <option value="insert">Insert</option>
+                  <option value="delete">Delete</option>
+                </select>
+                <input type="number" class="form-control" placeholder="Pos" value="7" />
+                <input type="text" class="form-control" placeholder=" amazing" />
+              </div>
+            </div>
+            <div class="col-md-4 user-col" id="user3">
+              <h4>User 3</h4>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="" id="user3-check" checked>
+                <label class="form-check-label" for="user3-check">
+                  Send to Server
+                </label>
+              </div>
+              <textarea class="form-control mb-2" rows="5">Hello, world!</textarea>
+              <div class="input-group mb-2">
+                <select class="form-select">
+                  <option value="insert">Insert</option>
+                  <option value="delete">Delete</option>
+                </select>
+                <input type="number" class="form-control" placeholder="Pos" value="7" />
+                <input type="text" class="form-control" placeholder=" wonderful" />
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary mt-3" onclick="sendAllOperations()">
+            Send All to Server
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "http://127.0.0.1:8000";
+
+      async function getDocument() {
+        const response = await fetch(`${API_BASE_URL}/document`);
+        const data = await response.json();
+        document.getElementById("serverState").textContent = data.document;
+        // Update all user textareas as well to show convergence
+        document.querySelectorAll(".user-col textarea").forEach((textarea) => {
+          textarea.value = data.document;
+        });
+        return data.document;
+      }
+
+      async function sendAllOperations() {
+        const users = ["user1", "user2", "user3"];
+        const operations = [];
+        users.forEach((userId) => {
+            const userCol = document.getElementById(userId);
+            const checkbox = userCol.querySelector('input[type=checkbox]');
+            if (checkbox.checked) {
+                const op_type = userCol.querySelector("select").value;
+                const pos = parseInt(userCol.querySelector("input[type=number]").value);
+                const text = userCol.querySelector("input[type=text]").value;
+                operations.push({ op_type, pos, text });
+
+                // Apply locally first
+                const textarea = userCol.querySelector('textarea');
+                if (op_type === 'insert') {
+                    textarea.value = textarea.value.slice(0, pos) + text + textarea.value.slice(pos);
+                } else if (op_type === 'delete') {
+                    textarea.value = textarea.value.slice(0, pos) + textarea.value.slice(pos + text.length);
+                }
+            }
+        });
+
+        if (operations.length === 0) {
+            showFeedback("No operations selected to send.", "info");
+            return;
+        }
+
+        try {
+            await fetch(`${API_BASE_URL}/apply-batch`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(operations),
+            });
+            // After all operations are sent, get the final server state
+            await getDocument();
+            showFeedback("All operations sent and server state updated.", "success");
+        } catch (error) {
+            console.error("Error sending operations:", error);
+            showFeedback("Error sending operations.", "danger");
+        }
+
+      }
+
+      function showFeedback(message, type) {
+        const feedbackDiv = document.getElementById("feedbackMessage");
+        feedbackDiv.textContent = message;
+        feedbackDiv.className = `alert alert-${type}`;
+        feedbackDiv.style.display = "block";
+        setTimeout(() => {
+          feedbackDiv.style.display = "none";
+        }, 3000);
+      }
+
+      window.onload = getDocument;
+
+      async function resetDocument() {
+        try {
+            await fetch(`${API_BASE_URL}/reset`, { method: "POST" });
+            await getDocument();
+            showFeedback("Document reset successfully.", "success");
+        } catch (error) {
+            console.error("Error resetting document:", error);
+            showFeedback("Error resetting document.", "danger");
+        }
+      }
+    </script>
+  </body>
+</html>
