@@ -131,6 +131,7 @@ The server can handle a batch of concurrent operations via the `/apply-batch` en
 If two users insert text at the same position, the server will transform the operations so that one insertion follows the other. The final order depends on the order in which the operations are processed in the batch.
 
 **Example:**
+
 - **Initial Document:** `Hello, world!`
 - **User 1 sends:** `{"op_type": "insert", "pos": 7, "text": " beautiful"}`
 - **User 2 sends:** `{"op_type": "insert", "pos": 7, "text": " amazing"}`
@@ -142,6 +143,7 @@ If User 1's operation is processed first, the final document will be: `Hello, be
 If one user inserts text at a position that another user is deleting, the transformation logic will adjust the operations to preserve the user's intent.
 
 **Example:**
+
 - **Initial Document:** `Hello, world!`
 - **User 1 sends:** `{"op_type": "insert", "pos": 7, "text": "new "}`
 - **User 2 sends:** `{"op_type": "delete", "pos": 0, "text": "Hello, "}`
@@ -153,6 +155,7 @@ If User 2's deletion is processed first, the document becomes `world!`. User 1's
 If two users delete overlapping text, the transformation logic will ensure that the correct text is removed without errors.
 
 **Example:**
+
 - **Initial Document:** `Hello, beautiful world!`
 - **User 1 sends:** `{"op_type": "delete", "pos": 7, "text": "beautiful "}`
 - **User 2 sends:** `{"op_type": "delete", "pos": 0, "text": "Hello, "}`
@@ -164,9 +167,11 @@ If User 2's operation is processed first, the document becomes `beautiful world!
 If one user deletes a range of text and another user inserts text within that range, the insertion will be effectively ignored because the text it was relative to has been removed.
 
 **Example:**
+
 - **Initial Document:** `Hello, world!`
 - **User 1 sends:** `{"op_type": "delete", "pos": 0, "text": "Hello, world!"}`
 - **User 2 sends:** `{"op_type": "insert", "pos": 7, "text": "new "}`
 
-If User 1's deletion is processed first, the document becomes empty. User 2's insertion will be transformed, but since its context is gone, it may be discarded or handled based on the specific transformation function logic. In our case, the transformation will likely result in a `None` operation, and the final document will be empty.
+If User 1's deletion is processed first, the document becomes empty. User 2's insertion will be transformed, but since its context is gone, it may be discarded or handled based on the specific transformation function logic. In our case, the transformation will likely result in a `insert` operation, and the final document will be 'new'.
 
+If User 2's insertion is processed first, the document becomes `Hello, new world!`. User 1's deletion of "Hello, world!" will be transformed. However, with our current simple transformation logic, this scenario is treated as an ambiguous overlap, and the deletion operation is discarded. This would result in a final document of `Hello, new world!`.
