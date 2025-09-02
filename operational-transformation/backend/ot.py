@@ -4,6 +4,9 @@ class Operation:
         self.pos = pos
         self.text = text
 
+    def to_dict(self):
+        return {"op_type": self.op_type, "pos": self.pos, "text": self.text}
+
 def apply_operation(doc, op):
     if op.op_type == "insert":
         return doc[:op.pos] + op.text + doc[op.pos:]

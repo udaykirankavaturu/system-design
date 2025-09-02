@@ -31,9 +31,20 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+# --- Pydantic Models for API data validation ---
+
+class OperationRequest(BaseModel):
+    op: OperationModel
+    revision: int
+
 # --- Global State ---
-document = "Hello, world!"
-history = []
+# We now store the document and its revision in a single dictionary.
+document_state = {
+    "doc": "Hello, world!",
+    "revision": 0
+}
+# History stores the sequence of operations applied to the document.
+history: List[Operation] = []
 
 
 # --- API Endpoints ---
@@ -45,67 +56,55 @@ async def read_index():
 @app.get("/document", tags=["Document"])
 def get_document():
     """
-    Returns the current state of the document.
+    Returns the current state of the document and its revision.
     """
-    return {"document": document}
+    return document_state
 
-@app.post("/apply", tags=["Operations"])
-def apply_op(op_model: OperationModel):
+@app.post("/apply-operation", tags=["Operations"])
+def apply_operation_endpoint(request: OperationRequest):
     """
-    Applies an operation to the document.
+    Applies a single operation to the document, transforming it if necessary.
     """
-    global document, history
+    global document_state, history
+    
+    client_op = Operation(request.op.op_type, request.op.pos, request.op.text or "")
+    client_revision = request.revision
+    
+    server_revision = document_state["revision"]
+    
+    # If the client's revision is out of date, we need to transform the operation.
+    if client_revision < server_revision:
+        # Get all operations that the client hasn't seen yet.
+        concurrent_ops = history[client_revision:]
+        for concurrent_op in concurrent_ops:
+            client_op = transform(client_op, concurrent_op)
+            if not client_op:
+                # The operation was transformed into a no-op (e.g., inserting into a deleted section).
+                raise HTTPException(
+                    status_code=409, # Conflict
+                    detail=f"Operation could not be applied after transformation. Client revision: {client_revision}, Server revision: {server_revision}"
+                )
 
-    op = Operation(op_model.op_type, op_model.pos, op_model.text or "")
-
-    # In a real system, you would transform this operation against concurrent operations.
-    # For this simple example, we'll just apply it directly.
-    # To simulate a more realistic scenario, you could transform against the last operation in the history.
-    if history:
-        last_op = history[-1]
-        op = transform(op, last_op)
-
-    if op:
-        document = apply_operation(document, op)
-        history.append(op)
-        return {"document": document}
-    else:
-        raise HTTPException(
-            status_code=400,
-            detail="Operation could not be applied."
-        )
-
-@app.post("/apply-batch", tags=["Operations"])
-def apply_batch(ops: List[OperationModel]):
-    """
-    Applies a batch of operations to the document, transforming them against each other.
-    """
-    global document, history
-
-    processed_ops = []
-    for op_model in ops:
-        op = Operation(op_model.op_type, op_model.pos, op_model.text or "")
-
-        # Transform the incoming operation against all previously processed operations in this batch.
-        for processed_op in processed_ops:
-            op = transform(op, processed_op)
-            if not op:
-                # If a transformation results in a None op, we can't continue with this one.
-                break
-        
-        if op:
-            document = apply_operation(document, op)
-            history.append(op)
-            processed_ops.append(op)
-
-    return {"document": document}
+    # Apply the (potentially transformed) operation.
+    document_state["doc"] = apply_operation(document_state["doc"], client_op)
+    document_state["revision"] += 1
+    history.append(client_op)
+    
+    return {
+        "doc": document_state["doc"],
+        "revision": document_state["revision"],
+        "applied_op": client_op.to_dict()
+    }
 
 @app.post("/reset", tags=["Document"])
 def reset_document():
     """
-    Resets the document to its original state.
+    Resets the document to its original state and revision 0.
     """
-    global document, history
-    document = "Hello, world!"
+    global document_state, history
+    document_state = {
+        "doc": "Hello, world!",
+        "revision": 0
+    }
     history = []
     return {"message": "Document reset successfully."}

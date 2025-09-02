@@ -16,6 +16,16 @@
         border-left: 1px solid #ddd;
         padding-left: 15px;
       }
+      #simulationLog {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        height: 300px;
+        overflow-y: scroll;
+        padding: 10px;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
     </style>
   </head>
   <body>
@@ -27,6 +37,7 @@
         <!-- Server Column -->
         <div class="col-md-3">
           <h3>Server State</h3>
+          <p>Revision: <strong id="serverRevision">0</strong></p>
           <button class="btn btn-info mb-3" onclick="getDocument()">
             Get Server Document
           </button>
@@ -47,14 +58,13 @@
                   Send to Server
                 </label>
               </div>
-              <textarea class="form-control mb-2" rows="5">Hello, world!</textarea>
               <div class="input-group mb-2">
                 <select class="form-select">
                   <option value="insert">Insert</option>
                   <option value="delete">Delete</option>
                 </select>
                 <input type="number" class="form-control" placeholder="Pos" value="7" />
-                <input type="text" class="form-control" placeholder="Text" value=" beautiful" />
+                <input type="text" class="form-control" placeholder="Text" value="beautiful " />
               </div>
             </div>
             <div class="col-md-4 user-col" id="user2">
@@ -65,14 +75,13 @@
                   Send to Server
                 </label>
               </div>
-              <textarea class="form-control mb-2" rows="5">Hello, world!</textarea>
               <div class="input-group mb-2">
                 <select class="form-select">
                   <option value="insert">Insert</option>
                   <option value="delete">Delete</option>
                 </select>
                 <input type="number" class="form-control" placeholder="Pos" value="7" />
-                <input type="text" class="form-control" placeholder=" amazing" />
+                <input type="text" class="form-control" placeholder="amazing " />
               </div>
             </div>
             <div class="col-md-4 user-col" id="user3">
@@ -83,39 +92,64 @@
                   Send to Server
                 </label>
               </div>
-              <textarea class="form-control mb-2" rows="5">Hello, world!</textarea>
               <div class="input-group mb-2">
                 <select class="form-select">
                   <option value="insert">Insert</option>
                   <option value="delete">Delete</option>
                 </select>
                 <input type="number" class="form-control" placeholder="Pos" value="7" />
-                <input type="text" class="form-control" placeholder=" wonderful" />
+                <input type="text" class="form-control" placeholder="wonderful " />
               </div>
             </div>
           </div>
-          <button class="btn btn-primary mt-3" onclick="sendAllOperations()">
-            Send All to Server
+          <button class="btn btn-primary mt-3" onclick="simulateConcurrentEdits()">
+            Simulate Concurrent Edits
           </button>
         </div>
+      </div>
+
+      <div class="row mt-4">
+          <div class="col-md-12">
+              <h4>Simulation Log</h4>
+              <div id="simulationLog"></div>
+          </div>
       </div>
     </div>
 
     <script>
       const API_BASE_URL = "http://127.0.0.1:8000";
+      let serverRevision = 0;
+
+      const logContainer = document.getElementById("simulationLog");
+
+      function log(message) {
+        logContainer.innerHTML += message + '\n';
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }
+
+      function clearLog() {
+        logContainer.innerHTML = '';
+      }
 
       async function getDocument() {
         const response = await fetch(`${API_BASE_URL}/document`);
         const data = await response.json();
-        document.getElementById("serverState").textContent = data.document;
-        // Update all user textareas as well to show convergence
-        document.querySelectorAll(".user-col textarea").forEach((textarea) => {
-          textarea.value = data.document;
-        });
-        return data.document;
+        document.getElementById("serverState").textContent = data.doc;
+        document.getElementById("serverRevision").textContent = data.revision;
+        serverRevision = data.revision;
+        return data;
       }
 
-      async function sendAllOperations() {
+      async function simulateConcurrentEdits() {
+        clearLog();
+
+        log("--- Starting Simulation ---");
+        // First, ensure we know the server's starting state.
+        const startState = await getDocument();
+        const initialRevision = startState.revision;
+        log(`All clients start with document at revision ${initialRevision}: "${startState.doc}"`);
+        log("-------------------------------------");
+
         const users = ["user1", "user2", "user3"];
         const operations = [];
         users.forEach((userId) => {
@@ -125,39 +159,54 @@
                 const op_type = userCol.querySelector("select").value;
                 const pos = parseInt(userCol.querySelector("input[type=number]").value);
                 const text = userCol.querySelector("input[type=text]").value;
-                operations.push({ op_type, pos, text });
-
-                // Apply locally first
-                const textarea = userCol.querySelector('textarea');
-                if (op_type === 'insert') {
-                    textarea.value = textarea.value.slice(0, pos) + text + textarea.value.slice(pos);
-                } else if (op_type === 'delete') {
-                    textarea.value = textarea.value.slice(0, pos) + textarea.value.slice(pos + text.length);
-                }
+                operations.push({ userId, op: { op_type, pos, text } });
             }
         });
 
         if (operations.length === 0) {
             showFeedback("No operations selected to send.", "info");
+            log("--- Simulation Ended: No operations selected. ---");
             return;
         }
 
+        // Send operations one by one, all based on the same initial revision
+        for (const {userId, op} of operations) {
+            await sendOperation(userId, op, initialRevision);
+        }
+
+        log("-------------------------------------");
+        log("--- Simulation Finished ---");
+        const finalState = await getDocument();
+        log(`Final server document at revision ${finalState.revision}: "${finalState.doc}"`);
+        showFeedback("Simulation finished. Check the log for details.", "success");
+      }
+
+      async function sendOperation(userId, op, revision) {
+        log(`[SEND] ${userId} sending op: ${JSON.stringify(op)} based on revision ${revision}`);
         try {
-            await fetch(`${API_BASE_URL}/apply-batch`, {
+            const response = await fetch(`${API_BASE_URL}/apply-operation`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(operations),
+                body: JSON.stringify({ op, revision }),
             });
-            // After all operations are sent, get the final server state
-            await getDocument();
-            showFeedback("All operations sent and server state updated.", "success");
-        } catch (error) {
-            console.error("Error sending operations:", error);
-            showFeedback("Error sending operations.", "danger");
-        }
 
+            const result = await response.json();
+
+            if (!response.ok) {
+                log(`[FAIL] ${userId} request failed: ${result.detail}`);
+            } else {
+                log(`[RECV] ${userId} op accepted. Server is now at revision ${result.revision}.`);
+                log(`       Original op: ${JSON.stringify(op)}`);
+                log(`       Applied op:  ${JSON.stringify(result.applied_op)}`);
+                document.getElementById("serverRevision").textContent = result.revision;
+                document.getElementById("serverState").textContent = result.doc;
+            }
+        } catch (error) {
+            log(`[ERROR] ${userId} request failed: ${error}`);
+        }
+        log("...");
       }
 
       function showFeedback(message, type) {
@@ -167,7 +216,7 @@
         feedbackDiv.style.display = "block";
         setTimeout(() => {
           feedbackDiv.style.display = "none";
-        }, 3000);
+        }, 4000);
       }
 
       window.onload = getDocument;
@@ -175,6 +224,8 @@
       async function resetDocument() {
         try {
             await fetch(`${API_BASE_URL}/reset`, { method: "POST" });
+            clearLog();
+            log("Document and revision history reset on the server.");
             await getDocument();
             showFeedback("Document reset successfully.", "success");
         } catch (error) {
