@@ -23,10 +23,14 @@ class BloomFilter:
         return hashes
 
     def add(self, item):
-        """Add an item to the Bloom filter."""
-        for hash_value in self._hashes(item):
+        """Add an item to the Bloom filter and return the hashes."""
+        hashes = self._hashes(item)
+        for hash_value in hashes:
             self.bit_array[hash_value] = 1
+        return hashes
 
     def check(self, item):
-        """Check if an item is possibly in the Bloom filter."""
-        return all(self.bit_array[hash_value] == 1 for hash_value in self._hashes(item))
+        """Check if an item is possibly in the Bloom filter and return the hashes."""
+        hashes = self._hashes(item)
+        possibly_exists = all(self.bit_array[hash_value] == 1 for hash_value in hashes)
+        return possibly_exists, hashes

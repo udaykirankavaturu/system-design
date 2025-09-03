@@ -93,10 +93,10 @@ Represents an item to be added to or checked in the filter.
 
 #### `POST /add`
 
-Adds an item to the Bloom filter.
+Adds an item to the Bloom filter and returns the generated hashes.
 
 - **Request Body:** `Item`
-- **Response:** `{"message": "'<item>' added to the bloom filter."}`
+- **Response:** `{"message": "'<item>' added...", "hashes": [12, 45, 67, 89]}`
 
 **cURL Example:**
 
@@ -108,10 +108,10 @@ curl -X POST "http://127.0.0.1:8000/add" \
 
 #### `POST /check`
 
-Checks if an item may be in the Bloom filter.
+Checks if an item may be in the Bloom filter and returns the generated hashes.
 
 - **Request Body:** `Item`
-- **Response:** `{"item": "<item>", "possibly_exists": true/false}`
+- **Response:** `{"item": "<item>", "possibly_exists": true/false, "hashes": [12, 45, 67, 89]}`
 
 **cURL Example:**
 
@@ -133,11 +133,23 @@ Returns the current state of the bloom filter, including the bit array and the n
 curl -X GET "http://127.0.0.1:8000/status"
 ```
 
+#### `GET /history`
+
+Returns the history of items added to the filter.
+
+- **Response:** `{"history": [{"item": "hello", "hashes": [12, 45, 67, 89]}]}`
+
+**cURL Example:**
+
+```bash
+curl -X GET "http://127.0.0.1:8000/history"
+```
+
 #### `POST /reset`
 
-Resets the Bloom filter to its initial empty state.
+Resets the Bloom filter and the history of added items to their initial empty state.
 
-- **Response:** `{"message": "Bloom filter has been reset."}`
+- **Response:** `{"message": "Bloom filter and history have been reset."}`
 
 **cURL Example:**
 
@@ -151,7 +163,10 @@ curl -X POST "http://127.0.0.1:8000/reset"
 2.  **Open the `frontend/index.html` file** in your web browser.
 
 - **Enter an item** in the input box.
-- **Click "Add"** to add the item to the Bloom filter.
-- **Click "Check"** to see if the item might be in the filter.
-- **Click "Reset"** to clear the Bloom filter.
+- **Click "Add"** to add the item to the Bloom filter. The bits in the array that are set by the hash functions will be highlighted.
+- **Click "Check"** to see if the item might be in the filter. The bits corresponding to the item's hashes will be highlighted.
+- **The generated hashes** for the last added or checked item will be displayed.
+- **A history of added items** and their hashes is shown in a table.
+- **Click "Reset"** to clear the Bloom filter and the history.
+
 
