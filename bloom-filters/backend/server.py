@@ -18,7 +18,7 @@ class Item(BaseModel):
     item: str
 
 # Initialize Bloom Filter
-bloom_filter = BloomFilter(size=100, hash_count=3)
+bloom_filter = BloomFilter(size=100)
 
 @app.post("/add")
 def add_item(item: Item):
@@ -35,11 +35,11 @@ def check_item(item: Item):
 @app.get("/status")
 def get_status():
     """Returns the current state of the bloom filter."""
-    return {"bit_array": bloom_filter.bit_array}
+    return {"bit_array": bloom_filter.bit_array, "hash_count": bloom_filter.hash_count}
 
 @app.post("/reset")
 def reset_filter():
     """Resets the bloom filter to its initial empty state."""
     global bloom_filter
-    bloom_filter = BloomFilter(size=100, hash_count=3)
+    bloom_filter = BloomFilter(size=100)
     return {"message": "Bloom filter has been reset."}

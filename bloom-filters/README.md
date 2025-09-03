@@ -13,19 +13,16 @@ This means the filter can have false positives but not false negatives.
 
 ## Hash Function Implementation
 
-To generate multiple hash values, this implementation uses a common technique. Instead of implementing *k* different hash functions, we use a single cryptographic hash function (`MD5`) and combine it with a simple iterative process.
+This implementation uses a fixed set of four hash functions to populate the bit array. This approach is common in real-world scenarios where a specific number of hash functions is chosen to balance performance and accuracy.
 
-For each item, the `_hashes` method iterates from `0` to `hash_count - 1`. In each iteration, it concatenates the item with the current iteration number, hashes the result using MD5, and then takes the modulo with the filter size to get an index within the bit array.
+The hash functions used are:
 
-This approach simulates the behavior of *k* independent hash functions without the complexity of designing and implementing them separately.
+- **MD5**: A widely used cryptographic hash function.
+- **Murmur3**: A popular non-cryptographic hash function known for its speed and good distribution.
+- **xxHash**: An extremely fast non-cryptographic hash function.
+- **FNV-1a 32-bit**: A simple and effective non-cryptographic hash function.
 
-In real-world applications, while this iterative approach is valid, the choice of hash function is critical for performance. Cryptographic hash functions like MD5 are generally slower than needed. Production-grade Bloom filters often use fast, non-cryptographic hash functions such as:
-
-- **MurmurHash**: A popular choice known for its speed and good distribution.
-- **xxHash**: An extremely fast hash function, often used in high-performance scenarios.
-- **Fowler-Noll-Vo (FNV)**: A simple and effective hash function that is also very fast.
-
-These functions are designed to be computationally inexpensive while still providing a uniform distribution of hash values, which is essential for the efficiency of the Bloom filter.
+For each item added to the filter, all four hash functions are applied to it, and the corresponding bits in the array are set to 1.
 
 ## Local Development Setup
 
@@ -65,7 +62,7 @@ With the virtual environment active, install the necessary Python packages using
 pip3 install -r requirements.txt
 ```
 
-This will install FastAPI and Uvicorn.
+This will install FastAPI, Uvicorn, and the required hash function libraries.
 
 ## Running the Server
 
@@ -126,9 +123,9 @@ curl -X POST "http://127.0.0.1:8000/check" \
 
 #### `GET /status`
 
-Returns the current state of the bloom filter's bit array.
+Returns the current state of the bloom filter, including the bit array and the number of hash functions used.
 
-- **Response:** `{"bit_array": [0, 1, 0, ..., 1]}`
+- **Response:** `{"bit_array": [0, 1, ...], "hash_count": 4}`
 
 **cURL Example:**
 
@@ -154,6 +151,7 @@ curl -X POST "http://127.0.0.1:8000/reset"
 2.  **Open the `frontend/index.html` file** in your web browser.
 
 - **Enter an item** in the input box.
-- **Click "Add"** to add the item to the Bloom filter. The bit array below will update.
+- **Click "Add"** to add the item to the Bloom filter.
 - **Click "Check"** to see if the item might be in the filter.
 - **Click "Reset"** to clear the Bloom filter.
+

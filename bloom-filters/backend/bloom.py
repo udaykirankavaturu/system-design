@@ -1,18 +1,25 @@
 import hashlib
+import mmh3
+import xxhash
+import fnvhash
 
 class BloomFilter:
-    def __init__(self, size, hash_count):
-        self.size = size  # Size of the bit array
-        self.hash_count = hash_count  # Number of hash functions
+    def __init__(self, size):
+        self.size = size
         self.bit_array = [0] * size
-    
+        # The number of hash functions is determined by the number of functions in _hashes
+        self.hash_count = 4
+
     def _hashes(self, item):
-        """Generate 'hash_count' hashes for the item using different hash functions."""
-        hashes = []
-        for i in range(self.hash_count):
-            # Create a unique hash for each iteration
-            hash_result = int(hashlib.md5((str(item) + str(i)).encode()).hexdigest(), 16) % self.size
-            hashes.append(hash_result)
+        """Generate hashes for the item using a set of different hash functions."""
+        item_bytes = str(item).encode()
+
+        hashes = [
+            int(hashlib.md5(item_bytes).hexdigest(), 16) % self.size,
+            mmh3.hash(item_bytes, 0) % self.size,  # Seed 0 for murmur3
+            xxhash.xxh32(item_bytes, seed=0).intdigest() % self.size, # Seed 0 for xxhash
+            fnvhash.fnv1_32(item_bytes) % self.size
+        ]
         return hashes
 
     def add(self, item):
