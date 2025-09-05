@@ -1,13 +1,14 @@
 import os
 import time
 import json
+from sortedcontainers import SortedDict
 
 TOMBSTONE = "__TOMBSTONE__"
 
 class MemTable:
     def __init__(self, threshold):
         self.threshold = threshold
-        self.data = {}
+        self.data = SortedDict()
         self.wal = open("wal.log", "a")
 
     def set(self, key, value):
@@ -20,7 +21,7 @@ class MemTable:
         return self.data.get(key)
 
     def clear(self):
-        self.data = {}
+        self.data = SortedDict()
         self.wal.close()
         os.remove("wal.log")
         self.wal = open("wal.log", "a")
@@ -53,7 +54,7 @@ class LSMTree:
     def flush(self):
         sstable_path = f"sstable_{int(time.time())}.log"
         with open(sstable_path, "w") as f:
-            for key, value in sorted(self.memtable.data.items()):
+            for key, value in self.memtable.data.items():
                 f.write(json.dumps({"key": key, "value": value}) + "\n")
         self.sstables.append(sstable_path)
         self.memtable.clear()
