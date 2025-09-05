@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from lsm import LSMTree
 import json
+import os
 
 app = FastAPI()
 
@@ -42,8 +43,8 @@ def get_key(key: str):
 def get_data():
     memtable_data = lsm_tree.memtable.data
     sstables_data = []
-    for sstable in lsm_tree.sstables:
-        with open(sstable, "r") as f:
+    for sstable_path, _ in lsm_tree.sstables:
+        with open(sstable_path, "r") as f:
             data = [json.loads(line) for line in f]
             sstables_data.append(data)
     return {"memtable": memtable_data, "sstables": sstables_data}
@@ -51,5 +52,8 @@ def get_data():
 @app.post("/clear")
 def clear_tree():
     global lsm_tree
+    for sstable_path, bf_path in lsm_tree.sstables:
+        os.remove(sstable_path)
+        os.remove(bf_path)
     lsm_tree = LSMTree(memtable_threshold=5)
     return {"status": "cleared"}

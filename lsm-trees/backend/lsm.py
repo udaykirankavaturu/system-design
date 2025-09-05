@@ -2,6 +2,7 @@ import os
 import time
 import json
 from sortedcontainers import SortedDict
+from bloom import BloomFilter
 
 TOMBSTONE = "__TOMBSTONE__"
 
@@ -43,39 +44,63 @@ class LSMTree:
         value = self.memtable.get(key)
         if value is not None:
             return value if value != TOMBSTONE else None
-        for sstable in reversed(self.sstables):
-            with open(sstable, "r") as f:
-                for line in f:
-                    entry = json.loads(line)
-                    if entry["key"] == key:
-                        return entry["value"] if entry["value"] != TOMBSTONE else None
+        for sstable_path, bf_path in reversed(self.sstables):
+            with open(bf_path, 'r') as f:
+                bit_array = json.load(f)
+            bf = BloomFilter(len(bit_array))
+            bf.bit_array = bit_array
+
+            if bf.check(key)[0]:
+                with open(sstable_path, "r") as f:
+                    for line in f:
+                        entry = json.loads(line)
+                        if entry["key"] == key:
+                            return entry["value"] if entry["value"] != TOMBSTONE else None
         return None
 
     def flush(self):
-        sstable_path = f"sstable_{int(time.time())}.log"
+        timestamp = int(time.time())
+        sstable_path = f"sstable_{timestamp}.log"
+        bf_path = f"sstable_{timestamp}.bf"
+        
+        bf = BloomFilter(size=1000) # Adjust size as needed
         with open(sstable_path, "w") as f:
             for key, value in self.memtable.data.items():
                 f.write(json.dumps({"key": key, "value": value}) + "\n")
-        self.sstables.append(sstable_path)
+                bf.add(key)
+
+        with open(bf_path, 'w') as f:
+            json.dump(bf.bit_array, f)
+
+        self.sstables.append((sstable_path, bf_path))
         self.memtable.clear()
         if len(self.sstables) >= self.compaction_threshold:
             self.compact()
 
     def compact(self):
         merged_data = {}
-        for sstable in self.sstables:
-            with open(sstable, "r") as f:
+        for sstable_path, _ in self.sstables:
+            with open(sstable_path, "r") as f:
                 for line in f:
                     entry = json.loads(line)
                     merged_data[entry["key"]] = entry["value"]
         
-        new_sstable_path = f"sstable_{int(time.time())}_compacted.log"
+        timestamp = int(time.time())
+        new_sstable_path = f"sstable_{timestamp}_compacted.log"
+        new_bf_path = f"sstable_{timestamp}_compacted.bf"
+
+        bf = BloomFilter(size=1000) # Adjust size as needed
         with open(new_sstable_path, "w") as f:
             for key, value in sorted(merged_data.items()):
                 if value != TOMBSTONE:
                     f.write(json.dumps({"key": key, "value": value}) + "\n")
+                    bf.add(key)
 
-        for sstable in self.sstables:
-            os.remove(sstable)
+        with open(new_bf_path, 'w') as f:
+            json.dump(bf.bit_array, f)
+
+        for sstable_path, bf_path in self.sstables:
+            os.remove(sstable_path)
+            os.remove(bf_path)
             
-        self.sstables = [new_sstable_path]
+        self.sstables = [(new_sstable_path, new_bf_path)]
