@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSM Tree Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { font-family: sans-serif; }
+        .container { display: flex; }
+        .controls { margin-right: 20px; }
+        .visualization { border: 1px solid black; padding: 10px; }
+        .memtable { background-color: #f0f0f0; padding: 10px; margin-bottom: 10px; }
+        .sstable { background-color: #e0e0e0; padding: 10px; margin-bottom: 5px; }
+        .node {
+            stroke: black;
+            stroke-width: 1;
+        }
+        .node-text {
+            font-size: 12px;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+        .tombstone {
+            fill: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>LSM Tree Visualization</h1>
+    <div class="container">
+        <div class="controls">
+            <h2>Controls</h2>
+            <div>
+                <input type="text" id="key-input" placeholder="Key">
+                <input type="text" id="value-input" placeholder="Value">
+                <button id="set-btn">Set</button>
+            </div>
+            <div>
+                <input type="text" id="get-key-input" placeholder="Key">
+                <button id="get-btn">Get</button>
+                <p id="get-result"></p>
+            </div>
+            <div>
+                <input type="text" id="delete-key-input" placeholder="Key">
+                <button id="delete-btn">Delete</button>
+            </div>
+            <div>
+                <button id="clear-btn">Clear</button>
+            </div>
+        </div>
+        <div class="visualization">
+            <h2>Visualization</h2>
+            <h3>MemTable</h3>
+            <svg id="memtable-vis" width="400" height="100"></svg>
+            <h3>SSTables</h3>
+            <svg id="sstables-vis" width="400" height="400"></svg>
+        </div>
+    </div>
+
+    <script>
+        const setBtn = document.getElementById('set-btn');
+        const getBtn = document.getElementById('get-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const keyInput = document.getElementById('key-input');
+        const valueInput = document.getElementById('value-input');
+        const getKeyInput = document.getElementById('get-key-input');
+        const deleteKeyInput = document.getElementById('delete-key-input');
+        const getResult = document.getElementById('get-result');
+        const memtableVis = d3.select('#memtable-vis');
+        const sstablesVis = d3.select('#sstables-vis');
+
+        const API_URL = 'http://127.0.0.1:8000';
+        const TOMBSTONE = "__TOMBSTONE__";
+
+        async function fetchData() {
+            const response = await fetch(`${API_URL}/data`);
+            const data = await response.json();
+            updateVisualization(data);
+        }
+
+        function updateVisualization(data) {
+            // MemTable Visualization
+            memtableVis.selectAll('*').remove();
+            const memtableData = Object.entries(data.memtable);
+            const memtableNodes = memtableVis.selectAll('g')
+                .data(memtableData)
+                .enter()
+                .append('g')
+                .attr('transform', (d, i) => `translate(${(i * 80) + 40}, 50)`);
+
+            memtableNodes.append('rect')
+                .attr('width', 70)
+                .attr('height', 30)
+                .attr('fill', d => d[1] === TOMBSTONE ? '#ff0000' : '#f0f0f0')
+                .attr('class', 'node');
+
+            memtableNodes.append('text')
+                .attr('class', 'node-text')
+                .text(d => `${d[0]}: ${d[1] === TOMBSTONE ? 'DEL' : d[1]}`);
+
+            // SSTables Visualization
+            sstablesVis.selectAll('*').remove();
+            const sstablesData = data.sstables;
+            let yOffset = 50;
+            sstablesData.forEach((sstable, sstableIndex) => {
+                const sstableGroup = sstablesVis.append('g')
+                    .attr('transform', `translate(0, ${yOffset})`);
+
+                sstableGroup.append('text')
+                    .attr('x', 20)
+                    .attr('y', -10)
+                    .text(`SSTable ${sstableIndex + 1}`);
+
+                const sstableNodes = sstableGroup.selectAll('g')
+                    .data(sstable)
+                    .enter()
+                    .append('g')
+                    .attr('transform', (d, i) => `translate(${(i * 80) + 40}, 0)`);
+
+                sstableNodes.append('rect')
+                    .attr('width', 70)
+                    .attr('height', 30)
+                    .attr('fill', d => d.value === TOMBSTONE ? '#ff0000' : '#e0e0e0')
+                    .attr('class', 'node');
+
+                sstableNodes.append('text')
+                    .attr('class', 'node-text')
+                    .text(d => `${d.key}: ${d.value === TOMBSTONE ? 'DEL' : d.value}`);
+                
+                yOffset += 80;
+            });
+        }
+
+        setBtn.addEventListener('click', async () => {
+            await fetch(`${API_URL}/set`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: keyInput.value, value: valueInput.value })
+            });
+            keyInput.value = '';
+            valueInput.value = '';
+            fetchData();
+        });
+
+        getBtn.addEventListener('click', async () => {
+            const response = await fetch(`${API_URL}/get?key=${getKeyInput.value}`);
+            const data = await response.json();
+            getResult.textContent = `Value: ${data.value}`;
+        });
+
+        deleteBtn.addEventListener('click', async () => {
+            await fetch(`${API_URL}/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: deleteKeyInput.value })
+            });
+            deleteKeyInput.value = '';
+            fetchData();
+        });
+
+        clearBtn.addEventListener('click', async () => {
+            await fetch(`${API_URL}/clear`, { method: 'POST' });
+            fetchData();
+        });
+
+        fetchData();
+    </script>
+</body>
+</html>
