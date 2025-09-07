@@ -24,11 +24,12 @@ class MemTable:
     def clear(self):
         self.data = SortedDict()
         self.wal.close()
-        os.remove("wal.log")
+        if os.path.exists("wal.log"):
+            os.remove("wal.log")
         self.wal = open("wal.log", "a")
 
 class LSMTree:
-    def __init__(self, memtable_threshold, compaction_threshold=2):
+    def __init__(self, memtable_threshold, compaction_threshold=4):
         self.memtable = MemTable(memtable_threshold)
         self.sstables = []
         self.compaction_threshold = compaction_threshold
@@ -78,8 +79,11 @@ class LSMTree:
             self.compact()
 
     def compact(self):
+        sstables_to_compact = self.sstables[:self.compaction_threshold]
+        remaining_sstables = self.sstables[self.compaction_threshold:]
+
         merged_data = {}
-        for sstable_path, _ in self.sstables:
+        for sstable_path, _ in sstables_to_compact:
             with open(sstable_path, "r") as f:
                 for line in f:
                     entry = json.loads(line)
@@ -99,8 +103,8 @@ class LSMTree:
         with open(new_bf_path, 'w') as f:
             json.dump(bf.bit_array, f)
 
-        for sstable_path, bf_path in self.sstables:
+        for sstable_path, bf_path in sstables_to_compact:
             os.remove(sstable_path)
             os.remove(bf_path)
             
-        self.sstables = [(new_sstable_path, new_bf_path)]
+        self.sstables = remaining_sstables + [(new_sstable_path, new_bf_path)]
