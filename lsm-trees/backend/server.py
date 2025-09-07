@@ -15,7 +15,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-lsm_tree = LSMTree(memtable_threshold=5)
+lsm_tree = LSMTree(memtable_threshold=2)
 
 class SetRequest(BaseModel):
     key: str
@@ -55,5 +55,7 @@ def clear_tree():
     for sstable_path, bf_path in lsm_tree.sstables:
         os.remove(sstable_path)
         os.remove(bf_path)
+    if os.path.exists("wal.log"):
+        os.remove("wal.log")
     lsm_tree = LSMTree(memtable_threshold=5)
     return {"status": "cleared"}

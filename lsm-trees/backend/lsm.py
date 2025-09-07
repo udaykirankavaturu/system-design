@@ -28,7 +28,7 @@ class MemTable:
         self.wal = open("wal.log", "a")
 
 class LSMTree:
-    def __init__(self, memtable_threshold, compaction_threshold=4):
+    def __init__(self, memtable_threshold, compaction_threshold=2):
         self.memtable = MemTable(memtable_threshold)
         self.sstables = []
         self.compaction_threshold = compaction_threshold
