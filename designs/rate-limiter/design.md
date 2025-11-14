@@ -43,6 +43,12 @@ Examples:
 
 - system should not break when something goes wrong with rate limiter
 
+# Actors and Actions
+
+![actors and actions](./assets//actors-actions.png)
+
+# Event Storming
+
 # High Level Design
 
 ![high level design](./assets/high-level-design.png)
