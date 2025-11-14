@@ -47,6 +47,10 @@ Examples:
 
 ![actors and actions](./assets//actors-actions.png)
 
+Without a rate limiter system, a user's request is routed through a client interface (browser/app) directly to a server to request a backend resource.
+
+With a rate limiter, the request is now routed through the rate limiter system where checks can be made on the limits.
+
 # Event Storming
 
 # High Level Design
