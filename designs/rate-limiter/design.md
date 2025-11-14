@@ -51,7 +51,11 @@ Without a rate limiter system, a user's request is routed through a client inter
 
 With a rate limiter, the request is now routed through the rate limiter system where checks can be made on the limits.
 
+As shown, the rate limiter is positioned before the load balancer. Refer to [ADR01](./ADRs/ADR01%20-%20where%20to%20position%20the%20rate%20limiter.md) to understand this decision.
+
 # Event Storming
+
+![event storming](./assets/event-storming.png)
 
 # High Level Design
 
