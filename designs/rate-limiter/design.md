@@ -59,6 +59,10 @@ As shown, the rate limiter is positioned before the load balancer. Refer to [ADR
 
 Two events are possible for any request. Limit is either reached or limit is not reached.
 
+# Workflow
+
+![workflow](./assets/workflow.png)
+
 # Components Identified
 
 - rate limiter server
