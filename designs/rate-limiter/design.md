@@ -94,3 +94,17 @@ Considering the overlapping architectural charateristics for the identified comp
 # C3 Diagram
 
 ![c3-diagram](./assets/c3-diagram.png)
+
+# Deployment Diagram
+
+![deployment-diagram](./assets/deployment-diagram.png)
+
+# Rate Limiting Algorithm Identified
+
+Refer to [ADR02-Choosing the Rate Limiting Algorithm](./ADRs/ADR02%20-%20choosing%20the%20rate%20limiting%20algorithm.md)
+
+# Memory Store Identified
+
+Refer to [ADR03-Choosing the Memory Store](./ADRs/ADR03-Choosing%20the%20Memory%20Store.md)
+
+# Risk Assessment
