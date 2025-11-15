@@ -38,7 +38,7 @@ Choosing a rate limiting algorithm to protect the system from abuse and overload
 
 - **Token Bucket**: Flexible and accurate, but can be complex to implement.
 - **Leaky Bucket**: Smooths out traffic, but not flexible for bursts.
-- **Fixed Window Counter**: Simple, but can be inaccurate at window edges.
+- **Fixed Window Counter**: Simple, but can be inaccurate at window edges (overlapping windows).
 - **Sliding Window Log**: Very accurate, but high memory usage.
 - **Sliding Window Counter**: Good balance of accuracy and memory usage, but more complex than Fixed Window.
 
@@ -49,3 +49,8 @@ Use the **Sliding Window Counter** algorithm.
 # Status
 
 ACCEPTED
+
+# Reference Links
+
+[Byte Byte Go](https://bytebytego.com/courses/system-design-interview/design-a-rate-limiter)
+[Arpit Bhayani](https://arpitbhayani.me/blogs/sliding-window-ratelimiter/)
