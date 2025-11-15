@@ -95,6 +95,16 @@ Considering the overlapping architectural charateristics for the identified comp
 
 ![c3-diagram](./assets/c3-diagram.png)
 
+# Risk Assessment
+
+| Risk                     | Likelihood | Impact | Mitigation                                                                            |
+| ------------------------ | ---------- | ------ | ------------------------------------------------------------------------------------- |
+| Single point of failure  | Medium     | High   | Use a load balancer with failover. Implement a fail-open mechanism at client level.   |
+| Performance bottleneck   | Medium     | High   | Use a high-performance memory store like Redis. Optimize the rate limiting algorithm. |
+| Incorrect configuration  | High       | Medium | Use CI CD and version control for configuration.                                      |
+| Data storage failure     | Medium     | High   | Use a clustered data store with replication.                                          |
+| Inaccurate rate limiting | Medium     | Medium | Use an accurate algorithm.                                                            |
+
 # Deployment Diagram
 
 ![deployment-diagram](./assets/deployment-diagram.png)
@@ -106,5 +116,3 @@ Refer to [ADR02-Choosing the Rate Limiting Algorithm](./ADRs/ADR02%20-%20choosin
 # Memory Store Identified
 
 Refer to [ADR03-Choosing the Memory Store](./ADRs/ADR03-Choosing%20the%20Memory%20Store.md)
-
-# Risk Assessment
