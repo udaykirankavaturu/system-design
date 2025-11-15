@@ -83,6 +83,14 @@ Considering the overlapping architectural charateristics for the identified comp
 
 ![architectural-style](./assets/quanta/rate-limiter-quantum/architectural-style.png)
 
-# High Level Design
+# C1 Diagram
 
-![high level design](./assets/high-level-design.png)
+![c1-diagram](./assets/c1-diagram.png)
+
+# C2 Diagram
+
+![c2-diagram](./assets/c2-diagram.png)
+
+# C3 Diagram
+
+![c3-diagram](./assets/c3-diagram.png)
