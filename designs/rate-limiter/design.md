@@ -69,6 +69,20 @@ Two events are possible for any request. Limit is either reached or limit is not
 - storage for current limits
 - storage for configuration of limits
 
+# Quanta Identified
+
+## Rate Limiter Quantum
+
+![rate-limiter-quantum](./assets/quanta/rate-limiter-quantum/components.png)
+
+Considering the overlapping architectural charateristics for the identified components, only one quantum is identified for building the rate limiter system.
+
+### Architectural Style Identified
+
+![architectural-style](./assets/quanta/rate-limiter-quantum/architectural-charateristics.png)
+
+![architectural-style](./assets/quanta/rate-limiter-quantum/architectural-style.png)
+
 # High Level Design
 
 ![high level design](./assets/high-level-design.png)
