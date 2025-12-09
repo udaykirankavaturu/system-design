@@ -48,7 +48,7 @@ Use the **Sliding Window Counter** algorithm.
 
 # Status
 
-ACCEPTED
+Accepted
 
 # Reference Links
 

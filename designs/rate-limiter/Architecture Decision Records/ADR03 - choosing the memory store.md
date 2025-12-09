@@ -41,4 +41,4 @@ Use **Redis** as the memory store.
 
 # Status
 
-Proposed
+Accepted

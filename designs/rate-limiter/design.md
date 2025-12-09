@@ -22,7 +22,7 @@ Examples:
 - system should accept connections within the set rate limit
 - system should reject connections outside the set rate limit
 - system should reset limit when the set interval is passed
-- system should support rate across multiple servers in a distributed environment
+- system should support rate limiting across multiple servers in a distributed environment
 
 # Non Functional Requirements
 
@@ -33,10 +33,13 @@ Examples:
 ### Scale
 
 - system should support large number of requests
+  - 100 million daily active users (DAU)
+    - 10 million requests per second (rps)
 
 ### Performance
 
 - system should not slow down current http response time
+  - <10ms rate limit check time
 - system should have low storage / memory footprint
 
 ### Availability
@@ -116,3 +119,7 @@ Refer to [ADR02-Choosing the Rate Limiting Algorithm](./ADRs/ADR02%20-%20choosin
 # Memory Store Identified
 
 Refer to [ADR03-Choosing the Memory Store](./ADRs/ADR03-Choosing%20the%20Memory%20Store.md)
+
+# Sharding
+
+Refer to [ADR04-Sharding](./ADRs/ADR04-Sharding.md)

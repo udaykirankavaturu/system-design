@@ -39,4 +39,4 @@ Place rate limiter before load balancer.
 
 # Status
 
-ACCEPTED
+Accepted
