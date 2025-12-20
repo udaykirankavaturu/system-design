@@ -123,3 +123,11 @@ Refer to [ADR03-Choosing the Memory Store](./Architecture%20Decision%20Records/A
 # Sharding
 
 Refer to [ADR04-Sharding](./Architecture%20Decision%20Records/ADR04%20-%20choosing%20a%20sharding%20strategy.md)
+
+# Cleanup
+
+Use TTL for keys with configured interval + buffer.
+
+# Failover
+
+When redis or rate limiter service fails, stop everything. Handle gracefully.
