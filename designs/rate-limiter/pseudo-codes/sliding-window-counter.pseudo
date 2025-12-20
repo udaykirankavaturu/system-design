@@ -1,0 +1,33 @@
+class SlidingWindowCounter {
+    WINDOW_SIZE: 60
+    LIMIT: 100
+    cache: Map<Key, Count> # Stores counts for fixed windows (e.g., "User:12:00", "User:12:01")
+
+    function allow_request(user_id):
+        now = GET_CURRENT_TIME()
+        
+        # 1. IDENTIFY WINDOWS
+        current_window_key = GET_WINDOW_KEY(now)      # e.g., "12:01"
+        previous_window_key = GET_WINDOW_KEY(now - 60) # e.g., "12:00"
+        
+        # 2. GET COUNTS
+        curr_count = cache.get(current_window_key) or 0
+        prev_count = cache.get(previous_window_key) or 0
+        
+        # 3. CALCULATE WEIGHT
+        # How far are we into the current window?
+        # If we are at 12:01:15, we are 25% (15/60) into the current window.
+        # This means 75% of the *previous* window still "overlaps" with our rolling 60s.
+        time_into_current_window = now % WINDOW_SIZE
+        weight = 1 - (time_into_current_window / WINDOW_SIZE)
+        
+        # 4. ESTIMATE RATE
+        # Formula: Current requests + (Previous requests * Weight)
+        weighted_count = curr_count + (prev_count * weight)
+        
+        # 5. DECIDE
+        if (weighted_count < LIMIT):
+            cache.increment(current_window_key)
+            return TRUE
+        else:
+            return FALSE

@@ -1,0 +1,46 @@
+class TokenBucket {
+    # --- Configuration (Static Rules) ---
+    MAX_CAPACITY: Integer   # The size of the bucket (Burst Limit)
+    REFILL_RATE: Float      # Tokens added per second (Sustained Rate)
+
+    # --- State (Stored in Redis or Memory) ---
+    current_tokens: Float   # How many tokens are currently in the bucket
+    last_updated_time: Long # Timestamp of the last request (in seconds)
+
+    # Constructor
+    function init(capacity, rate) {
+        this.MAX_CAPACITY = capacity
+        this.REFILL_RATE = rate
+        
+        # Start full
+        this.current_tokens = capacity  
+        this.last_updated_time = NOW()
+    }
+}
+
+function allow_request(tokens_needed):
+    # 1. GET CURRENT TIME
+    now = GET_CURRENT_TIME_SECONDS()
+
+    # 2. LAZY REFILL (The Magic)
+    # Calculate how much time passed since the last request
+    time_passed = now - this.last_updated_time
+    
+    # Calculate how many tokens "grew" during that time
+    tokens_to_add = time_passed * this.REFILL_RATE
+    
+    # Add them to the bucket, but DO NOT exceed the Max Capacity
+    # This 'min' function effectively "discards" overflow tokens
+    this.current_tokens = min(this.MAX_CAPACITY, this.current_tokens + tokens_to_add)
+    
+    # Update the timestamp immediately
+    this.last_updated_time = now
+
+    # 3. CHECK & CONSUME
+    if (this.current_tokens >= tokens_needed):
+        # User has enough tokens. Deduct them.
+        this.current_tokens = this.current_tokens - tokens_needed
+        return TRUE  # Request Allowed (200 OK)
+    else:
+        # Not enough tokens.
+        return FALSE # Request Blocked (429 Too Many Requests)

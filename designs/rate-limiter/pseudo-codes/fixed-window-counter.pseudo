@@ -1,0 +1,44 @@
+class FixedWindowCounter {
+    # --- Configuration ---
+    WINDOW_SIZE_SECONDS: Integer  # e.g., 60 seconds
+    REQUEST_LIMIT: Integer        # e.g., 100 requests
+
+    # --- State (Usually stored in Redis) ---
+    # A Dictionary/Hash map where:
+    # Key   = "UserID:WindowTimestamp"
+    # Value = Count of requests
+    windows: Map<String, Integer> 
+
+    function init(window_size, limit) {
+        this.WINDOW_SIZE_SECONDS = window_size
+        this.REQUEST_LIMIT = limit
+        this.windows = new Map()
+    }
+}
+
+function allow_request(user_id):
+    # 1. GET CURRENT TIME
+    now = GET_CURRENT_TIME_SECONDS()
+
+    # 2. CALCULATE CURRENT WINDOW KEY
+    # Example: If now=1000 and Window=60
+    # current_window_start = 1000 / 60 = 16 (Integer Division)
+    # The key becomes something like "User123:16"
+    current_window_key = user_id + ":" + floor(now / this.WINDOW_SIZE_SECONDS)
+
+    # 3. GET CURRENT COUNT
+    # If the key doesn't exist, it means we are in a new window -> Count is 0
+    request_count = this.windows.get(current_window_key) or 0
+
+    # 4. CHECK LIMIT
+    if (request_count >= this.REQUEST_LIMIT):
+        return FALSE  # Blocked (429 Too Many Requests)
+    
+    else:
+        # 5. INCREMENT & ALLOW
+        # Increment the count for this specific window
+        this.windows.put(current_window_key, request_count + 1)
+        
+        # Optional: Set an expiry on this key to save memory
+        # (e.g., Delete this key after Window Size + Buffer)
+        return TRUE   # Allowed (200 OK)

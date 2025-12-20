@@ -54,7 +54,7 @@ Without a rate limiter system, a user's request is routed through a client inter
 
 With a rate limiter, the request is now routed through the rate limiter system where checks can be made on the limits.
 
-As shown, the rate limiter is positioned before the load balancer. Refer to [ADR01-Positioning the Rate Limiter](./ADRs/ADR01%20-%20where%20to%20position%20the%20rate%20limiter.md) to understand this decision.
+As shown, the rate limiter is positioned before the load balancer. Refer to [ADR01-Positioning the Rate Limiter](./Architecture%20Decision%20Records/ADR01%20-%20where%20to%20position%20the%20rate%20limiter.md) to understand this decision.
 
 # Event Storming
 
@@ -114,12 +114,12 @@ Considering the overlapping architectural charateristics for the identified comp
 
 # Rate Limiting Algorithm Identified
 
-Refer to [ADR02-Choosing the Rate Limiting Algorithm](./ADRs/ADR02%20-%20choosing%20the%20rate%20limiting%20algorithm.md)
+Refer to [ADR02-Choosing the Rate Limiting Algorithm](./Architecture%20Decision%20Records//ADR02%20-%20choosing%20the%20rate%20limiting%20algorithm.md)
 
 # Memory Store Identified
 
-Refer to [ADR03-Choosing the Memory Store](./ADRs/ADR03-Choosing%20the%20Memory%20Store.md)
+Refer to [ADR03-Choosing the Memory Store](./Architecture%20Decision%20Records/ADR03%20-%20choosing%20the%20memory%20store.md)
 
 # Sharding
 
-Refer to [ADR04-Sharding](./ADRs/ADR04-Sharding.md)
+Refer to [ADR04-Sharding](./Architecture%20Decision%20Records/ADR04%20-%20choosing%20a%20sharding%20strategy.md)
