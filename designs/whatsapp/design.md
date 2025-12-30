@@ -20,7 +20,7 @@ whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 cal
 - system should allow authentication of existing users
 - user should be able to send text message via internet to other users on the platform
 - user should be able to receive text message from other users
-- user should be notified when a new message arrives
+- user should be notified when a new message arrives in near real time
 
 # Non functional requirements
 
@@ -29,5 +29,16 @@ whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 cal
   - queries per second (QPS) - 1 million
   - peak qps - 100 million
   - storage @ 1kb per message - retention of 7 days
-    - 2.1 PB (see [storage calcuation](./assets/storage%20calculation.png))
--
+    - ~2.1 PB (see [storage calcuation](./assets/storage%20calculation.png))
+- performance
+  - <500 ms
+- availability
+  - 99.99% for chat, 99.9% for notifications
+- durability
+  - messages are never lost
+- consistency
+  - messages are delivered in sequence
+
+# Actors Actions
+
+[Diagram](./assets/actors%20actions.png)
