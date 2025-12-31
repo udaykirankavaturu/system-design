@@ -41,4 +41,20 @@ whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 cal
 
 # Actors Actions
 
-[Diagram](./assets/actors%20actions.png)
+![Diagram](./assets/actors%20actions.png)
+
+# Event Storming
+
+![Diagram](./assets/event%20storming.png)
+
+# Workflow
+
+![Diagram](./assets/workflow.png)
+
+# Components
+
+![Diagram](./assets/components.png)
+
+# Characteristics
+
+![Diagram](./assets/characteristics.png)
