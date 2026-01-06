@@ -58,3 +58,11 @@ whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 cal
 # Characteristics
 
 ![Diagram](./assets/characteristics.png)
+
+# Quanta
+
+![Diagram](./assets/quanta.png)
+
+# Architecture Styles
+
+![Diagram](./assets/architecture%20styles.png)
