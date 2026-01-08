@@ -66,3 +66,13 @@ whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 cal
 # Architecture Styles
 
 ![Diagram](./assets/architecture%20styles.png)
+
+# C1
+
+![Diagram](./assets/c1.png)
+
+# C2
+
+![Diagram](./assets/c2.png)
+
+#
