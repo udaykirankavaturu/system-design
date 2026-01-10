@@ -75,4 +75,16 @@ whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 cal
 
 ![Diagram](./assets/c2.png)
 
-#
+# C3
+
+![Diagram](./assets/c3.png)
+
+# Capacity Planning | Back of the Envelope Estimation
+
+| Component          | Constraint               | Scaling Metric             | Est. Count      |
+| :----------------- | :----------------------- | :------------------------- | :-------------- |
+| **Chat Service**   | Concurrent Connections   | 100M Users / 20k per pod   | **~5,000 Pods** |
+| **User Service**   | CPU / Throughput         | 1M QPS / 1k per pod        | **~1,000 Pods** |
+| **Notif. Service** | I/O Wait (3rd Party API) | 200k Push/s / 2k per pod   | **~100 Pods**   |
+| **Cassandra**      | Write Speed (I/O)        | 1M Write/s / 10k per node  | **~100 Nodes**  |
+| **Redis**          | RAM (Memory)             | 100GB Data / 16GB per node | **~12 Nodes**   |
