@@ -1,6 +1,6 @@
 # System design for 'whatsapp'
 
-whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 calling, group calls, sharing files, backups, payment and more.
+whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 calling, group calls, sharing files, backups, payments and more.
 
 # Restricting scope for system design
 
@@ -78,6 +78,19 @@ whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 cal
 # C3
 
 ![Diagram](./assets/c3.png)
+
+# To show user online/offline status
+
+- use websocket ping pong
+
+# When receiver is offline
+
+- disconnection session after threshold timeout
+- hold undelivered messages in database, trigger delivery on new connection
+
+# When phone crashes
+
+- connection to websocket is lost, establish new connection on launch
 
 # Capacity Planning | Back of the Envelope Estimation
 
