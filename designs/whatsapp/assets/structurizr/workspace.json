@@ -1,0 +1,558 @@
+{
+  "configuration" : { },
+  "description" : "Architecture diagrams for WhatsApp scaling to 1 Billion Users",
+  "documentation" : { },
+  "id" : 1,
+  "lastModifiedAgent" : "structurizr-ui",
+  "lastModifiedDate" : "2026-01-20T01:26:29Z",
+  "model" : {
+    "people" : [ {
+      "description" : "User",
+      "id" : "1",
+      "name" : "Uday",
+      "properties" : {
+        "structurizr.dsl.identifier" : "uday"
+      },
+      "relationships" : [ {
+        "description" : "Logs in and maintains active connection",
+        "destinationId" : "4",
+        "id" : "23",
+        "sourceId" : "1",
+        "tags" : "Relationship",
+        "technology" : "HTTPS + WebSocket"
+      } ],
+      "tags" : "Element,Person"
+    }, {
+      "description" : "User",
+      "id" : "2",
+      "name" : "Sam",
+      "properties" : {
+        "structurizr.dsl.identifier" : "sam"
+      },
+      "relationships" : [ {
+        "description" : "Logs in and maintains active connection",
+        "destinationId" : "4",
+        "id" : "24",
+        "sourceId" : "2",
+        "tags" : "Relationship",
+        "technology" : "HTTPS + WebSocket"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "description" : "Provider for sending SMSes to users.",
+      "documentation" : { },
+      "id" : "3",
+      "name" : "SMS Service",
+      "properties" : {
+        "structurizr.dsl.identifier" : "externalSms"
+      },
+      "tags" : "Element,Software System,External"
+    }, {
+      "containers" : [ {
+        "description" : "Mobile client to communicate with backend.",
+        "documentation" : { },
+        "id" : "5",
+        "name" : "Mobile Client App",
+        "properties" : {
+          "structurizr.dsl.identifier" : "mobileApp"
+        },
+        "relationships" : [ {
+          "description" : "Sends API calls + Websocket connection requests",
+          "destinationId" : "6",
+          "id" : "26",
+          "sourceId" : "5",
+          "tags" : "Relationship",
+          "technology" : "HTTPS + WebSocket"
+        } ],
+        "tags" : "Element,Container,Mobile",
+        "technology" : "iOS + Android / Cross Platform"
+      }, {
+        "description" : "Gateway to the multiple backend services.",
+        "documentation" : { },
+        "id" : "6",
+        "name" : "API Gateway",
+        "properties" : {
+          "structurizr.dsl.identifier" : "apiGateway"
+        },
+        "relationships" : [ {
+          "description" : "Makes API calls",
+          "destinationId" : "13",
+          "id" : "27",
+          "sourceId" : "6",
+          "tags" : "Relationship",
+          "technology" : "HTTPS"
+        }, {
+          "description" : "Makes API calls + Websocket connection requests",
+          "destinationId" : "16",
+          "id" : "28",
+          "sourceId" : "6",
+          "tags" : "Relationship",
+          "technology" : "HTTPS + WebSocket"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "NGINX / Kong"
+      }, {
+        "description" : "Storage for user details.",
+        "documentation" : { },
+        "id" : "7",
+        "name" : "SQL Database",
+        "properties" : {
+          "structurizr.dsl.identifier" : "userDb"
+        },
+        "tags" : "Element,Container,Database",
+        "technology" : "Postgres"
+      }, {
+        "description" : "Storage with high write throughput.",
+        "documentation" : { },
+        "id" : "8",
+        "name" : "NoSQL Database for Chat",
+        "properties" : {
+          "structurizr.dsl.identifier" : "chatDb"
+        },
+        "tags" : "Element,Container,Database",
+        "technology" : "Apache Cassandra / MongoDB"
+      }, {
+        "description" : "Storage for notification details and metadata.",
+        "documentation" : { },
+        "id" : "9",
+        "name" : "NoSQL Database for Notifications",
+        "properties" : {
+          "structurizr.dsl.identifier" : "notifDb"
+        },
+        "tags" : "Element,Container,Database",
+        "technology" : "MongoDB"
+      }, {
+        "description" : "Contains a cluster of in-memory containers.",
+        "documentation" : { },
+        "id" : "10",
+        "name" : "Redis Cluster",
+        "properties" : {
+          "structurizr.dsl.identifier" : "redisCluster"
+        },
+        "tags" : "Element,Container,Database",
+        "technology" : "Redis"
+      }, {
+        "description" : "Storage for SMS limits and metadata.",
+        "documentation" : { },
+        "id" : "11",
+        "name" : "In-Memory Store",
+        "properties" : {
+          "structurizr.dsl.identifier" : "smsCache"
+        },
+        "tags" : "Element,Container,Database",
+        "technology" : "Redis"
+      }, {
+        "description" : "Message queue broker for listening to events and processing them.",
+        "documentation" : { },
+        "id" : "12",
+        "name" : "Message Broker",
+        "properties" : {
+          "structurizr.dsl.identifier" : "messageBroker"
+        },
+        "relationships" : [ {
+          "description" : "Forwards messages for processing",
+          "destinationId" : "14",
+          "id" : "34",
+          "sourceId" : "12",
+          "tags" : "Relationship",
+          "technology" : "AMQP"
+        } ],
+        "tags" : "Element,Container,Queue",
+        "technology" : "RabbitMQ"
+      }, {
+        "description" : "For user registration, login, profile updates.",
+        "documentation" : { },
+        "id" : "13",
+        "name" : "User Service",
+        "properties" : {
+          "structurizr.dsl.identifier" : "userService"
+        },
+        "relationships" : [ {
+          "description" : "Makes API calls",
+          "destinationId" : "7",
+          "id" : "29",
+          "sourceId" : "13",
+          "tags" : "Relationship",
+          "technology" : "HTTPS"
+        }, {
+          "description" : "Makes API calls",
+          "destinationId" : "15",
+          "id" : "30",
+          "sourceId" : "13",
+          "tags" : "Relationship",
+          "technology" : "HTTPS"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Node.js / Java"
+      }, {
+        "description" : "Triggers push notifications to users when events happen.",
+        "documentation" : { },
+        "id" : "14",
+        "name" : "Notification Service",
+        "properties" : {
+          "structurizr.dsl.identifier" : "notificationService"
+        },
+        "relationships" : [ {
+          "description" : "Makes API calls",
+          "destinationId" : "9",
+          "id" : "35",
+          "sourceId" : "14",
+          "tags" : "Relationship",
+          "technology" : "HTTPS"
+        }, {
+          "description" : "Sends push notifications",
+          "destinationId" : "5",
+          "id" : "36",
+          "sourceId" : "14",
+          "tags" : "Relationship",
+          "technology" : "WebSocket/APNS"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "APNS / FCM"
+      }, {
+        "description" : "Triggers APIs to third party provider for sending SMSes to user.",
+        "documentation" : { },
+        "id" : "15",
+        "name" : "SMS Service",
+        "properties" : {
+          "structurizr.dsl.identifier" : "internalSmsService"
+        },
+        "relationships" : [ {
+          "description" : "Makes API calls",
+          "destinationId" : "11",
+          "id" : "37",
+          "sourceId" : "15",
+          "tags" : "Relationship",
+          "technology" : "HTTPS"
+        }, {
+          "description" : "Makes API calls",
+          "destinationId" : "3",
+          "id" : "38",
+          "sourceId" : "15",
+          "tags" : "Relationship",
+          "technology" : "HTTPS"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Node.js"
+      }, {
+        "components" : [ {
+          "description" : "For persistent connections between user and server. Validates sessions. Sends messages and saves.",
+          "documentation" : { },
+          "id" : "17",
+          "name" : "WebSocket Handler",
+          "properties" : {
+            "structurizr.dsl.identifier" : "webSocketHandler"
+          },
+          "tags" : "Element,Component",
+          "technology" : "socket.io"
+        }, {
+          "description" : "Checks user's connection server identity. Sends messages to memory to save.",
+          "documentation" : { },
+          "id" : "18",
+          "name" : "Session Manager",
+          "properties" : {
+            "structurizr.dsl.identifier" : "sessionManager"
+          },
+          "tags" : "Element,Component",
+          "technology" : "ioredis"
+        }, {
+          "description" : "UUID ID generator for each message.",
+          "documentation" : { },
+          "id" : "19",
+          "name" : "Unique ID Generator",
+          "properties" : {
+            "structurizr.dsl.identifier" : "idGenerator"
+          },
+          "tags" : "Element,Component",
+          "technology" : "uuid4"
+        }, {
+          "description" : "Reads and writes to cache.",
+          "documentation" : { },
+          "id" : "20",
+          "name" : "Cache Manager",
+          "properties" : {
+            "structurizr.dsl.identifier" : "cacheManager"
+          },
+          "tags" : "Element,Component",
+          "technology" : "ioredis"
+        }, {
+          "description" : "Writes messages to database.",
+          "documentation" : { },
+          "id" : "21",
+          "name" : "Database Client",
+          "properties" : {
+            "structurizr.dsl.identifier" : "dbClient"
+          },
+          "tags" : "Element,Component",
+          "technology" : "cassandra-driver"
+        }, {
+          "description" : "Adds messages to broker about each message - to notify recipient user.",
+          "documentation" : { },
+          "id" : "22",
+          "name" : "Event Publisher",
+          "properties" : {
+            "structurizr.dsl.identifier" : "eventPublisher"
+          },
+          "tags" : "Element,Component",
+          "technology" : "rabbitmq-client"
+        } ],
+        "description" : "Manages chats. Sends messages between users. Saves messages.",
+        "documentation" : { },
+        "id" : "16",
+        "name" : "Chat Service",
+        "properties" : {
+          "structurizr.dsl.identifier" : "chatService"
+        },
+        "relationships" : [ {
+          "description" : "Makes API calls",
+          "destinationId" : "10",
+          "id" : "31",
+          "sourceId" : "16",
+          "tags" : "Relationship",
+          "technology" : "HTTPS"
+        }, {
+          "description" : "Makes API calls",
+          "destinationId" : "8",
+          "id" : "32",
+          "sourceId" : "16",
+          "tags" : "Relationship",
+          "technology" : "HTTPS"
+        }, {
+          "description" : "Sends messages for events",
+          "destinationId" : "12",
+          "id" : "33",
+          "sourceId" : "16",
+          "tags" : "Relationship",
+          "technology" : "AMQP"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Node.js (Socket.io)"
+      } ],
+      "description" : "System for one to one messaging over the internet.",
+      "documentation" : { },
+      "id" : "4",
+      "name" : "WhatsApp",
+      "properties" : {
+        "structurizr.dsl.identifier" : "whatsapp"
+      },
+      "relationships" : [ {
+        "description" : "Makes API calls to trigger SMS",
+        "destinationId" : "3",
+        "id" : "25",
+        "sourceId" : "4",
+        "tags" : "Relationship",
+        "technology" : "HTTPS"
+      } ],
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "WhatsApp System Design",
+  "properties" : {
+    "structurizr.inspection.info" : "0",
+    "structurizr.inspection.ignore" : "0",
+    "structurizr.inspection.error" : "15",
+    "structurizr.inspection.warning" : "0",
+    "structurizr.dsl" : "d29ya3NwYWNlICJXaGF0c0FwcCBTeXN0ZW0gRGVzaWduIiAiQXJjaGl0ZWN0dXJlIGRpYWdyYW1zIGZvciBXaGF0c0FwcCBzY2FsaW5nIHRvIDEgQmlsbGlvbiBVc2VycyIgewoKICAgIG1vZGVsIHsKICAgICAgICAjIC0tLSBMZXZlbCAxOiBDb250ZXh0IC0tLQogICAgICAgIHVkYXkgPSBwZXJzb24gIlVkYXkiICJVc2VyIgogICAgICAgIHNhbSA9IHBlcnNvbiAiU2FtIiAiVXNlciIKICAgICAgICAKICAgICAgICBleHRlcm5hbFNtcyA9IHNvZnR3YXJlU3lzdGVtICJTTVMgU2VydmljZSIgIlByb3ZpZGVyIGZvciBzZW5kaW5nIFNNU2VzIHRvIHVzZXJzLiIgIkV4dGVybmFsIgoKICAgICAgICB3aGF0c2FwcCA9IHNvZnR3YXJlU3lzdGVtICJXaGF0c0FwcCIgIlN5c3RlbSBmb3Igb25lIHRvIG9uZSBtZXNzYWdpbmcgb3ZlciB0aGUgaW50ZXJuZXQuIiB7CiAgICAgICAgICAgIAogICAgICAgICAgICAjIC0tLSBMZXZlbCAyOiBDb250YWluZXJzIC0tLQogICAgICAgICAgICAKICAgICAgICAgICAgbW9iaWxlQXBwID0gY29udGFpbmVyICJNb2JpbGUgQ2xpZW50IEFwcCIgIk1vYmlsZSBjbGllbnQgdG8gY29tbXVuaWNhdGUgd2l0aCBiYWNrZW5kLiIgImlPUyArIEFuZHJvaWQgLyBDcm9zcyBQbGF0Zm9ybSIgIk1vYmlsZSIKICAgICAgICAgICAgCiAgICAgICAgICAgIGFwaUdhdGV3YXkgPSBjb250YWluZXIgIkFQSSBHYXRld2F5IiAiR2F0ZXdheSB0byB0aGUgbXVsdGlwbGUgYmFja2VuZCBzZXJ2aWNlcy4iICJOR0lOWCAvIEtvbmciCiAgICAgICAgICAgIAogICAgICAgICAgICAjIERhdGFiYXNlcyAmIEJyb2tlcnMKICAgICAgICAgICAgdXNlckRiID0gY29udGFpbmVyICJTUUwgRGF0YWJhc2UiICJTdG9yYWdlIGZvciB1c2VyIGRldGFpbHMuIiAiUG9zdGdyZXMiICJEYXRhYmFzZSIKICAgICAgICAgICAgY2hhdERiID0gY29udGFpbmVyICJOb1NRTCBEYXRhYmFzZSBmb3IgQ2hhdCIgIlN0b3JhZ2Ugd2l0aCBoaWdoIHdyaXRlIHRocm91Z2hwdXQuIiAiQXBhY2hlIENhc3NhbmRyYSAvIE1vbmdvREIiICJEYXRhYmFzZSIKICAgICAgICAgICAgbm90aWZEYiA9IGNvbnRhaW5lciAiTm9TUUwgRGF0YWJhc2UgZm9yIE5vdGlmaWNhdGlvbnMiICJTdG9yYWdlIGZvciBub3RpZmljYXRpb24gZGV0YWlscyBhbmQgbWV0YWRhdGEuIiAiTW9uZ29EQiIgIkRhdGFiYXNlIgogICAgICAgICAgICByZWRpc0NsdXN0ZXIgPSBjb250YWluZXIgIlJlZGlzIENsdXN0ZXIiICJDb250YWlucyBhIGNsdXN0ZXIgb2YgaW4tbWVtb3J5IGNvbnRhaW5lcnMuIiAiUmVkaXMiICJEYXRhYmFzZSIKICAgICAgICAgICAgc21zQ2FjaGUgPSBjb250YWluZXIgIkluLU1lbW9yeSBTdG9yZSIgIlN0b3JhZ2UgZm9yIFNNUyBsaW1pdHMgYW5kIG1ldGFkYXRhLiIgIlJlZGlzIiAiRGF0YWJhc2UiCiAgICAgICAgICAgIG1lc3NhZ2VCcm9rZXIgPSBjb250YWluZXIgIk1lc3NhZ2UgQnJva2VyIiAiTWVzc2FnZSBxdWV1ZSBicm9rZXIgZm9yIGxpc3RlbmluZyB0byBldmVudHMgYW5kIHByb2Nlc3NpbmcgdGhlbS4iICJSYWJiaXRNUSIgIlF1ZXVlIgoKICAgICAgICAgICAgIyBTZXJ2aWNlcwogICAgICAgICAgICB1c2VyU2VydmljZSA9IGNvbnRhaW5lciAiVXNlciBTZXJ2aWNlIiAiRm9yIHVzZXIgcmVnaXN0cmF0aW9uLCBsb2dpbiwgcHJvZmlsZSB1cGRhdGVzLiIgIk5vZGUuanMgLyBKYXZhIgogICAgICAgICAgICBub3RpZmljYXRpb25TZXJ2aWNlID0gY29udGFpbmVyICJOb3RpZmljYXRpb24gU2VydmljZSIgIlRyaWdnZXJzIHB1c2ggbm90aWZpY2F0aW9ucyB0byB1c2VycyB3aGVuIGV2ZW50cyBoYXBwZW4uIiAiQVBOUyAvIEZDTSIKICAgICAgICAgICAgaW50ZXJuYWxTbXNTZXJ2aWNlID0gY29udGFpbmVyICJTTVMgU2VydmljZSIgIlRyaWdnZXJzIEFQSXMgdG8gdGhpcmQgcGFydHkgcHJvdmlkZXIgZm9yIHNlbmRpbmcgU01TZXMgdG8gdXNlci4iICJOb2RlLmpzIgogICAgICAgICAgICAKICAgICAgICAgICAgY2hhdFNlcnZpY2UgPSBjb250YWluZXIgIkNoYXQgU2VydmljZSIgIk1hbmFnZXMgY2hhdHMuIFNlbmRzIG1lc3NhZ2VzIGJldHdlZW4gdXNlcnMuIFNhdmVzIG1lc3NhZ2VzLiIgIk5vZGUuanMgKFNvY2tldC5pbykiIHsKICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgIyAtLS0gTGV2ZWwgMzogQ29tcG9uZW50cyAoSW5zaWRlIENoYXQgU2VydmljZSkgLS0tCiAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIHdlYlNvY2tldEhhbmRsZXIgPSBjb21wb25lbnQgIldlYlNvY2tldCBIYW5kbGVyIiAiRm9yIHBlcnNpc3RlbnQgY29ubmVjdGlvbnMgYmV0d2VlbiB1c2VyIGFuZCBzZXJ2ZXIuIFZhbGlkYXRlcyBzZXNzaW9ucy4gU2VuZHMgbWVzc2FnZXMgYW5kIHNhdmVzLiIgInNvY2tldC5pbyIKICAgICAgICAgICAgICAgIHNlc3Npb25NYW5hZ2VyID0gY29tcG9uZW50ICJTZXNzaW9uIE1hbmFnZXIiICJDaGVja3MgdXNlcidzIGNvbm5lY3Rpb24gc2VydmVyIGlkZW50aXR5LiBTZW5kcyBtZXNzYWdlcyB0byBtZW1vcnkgdG8gc2F2ZS4iICJpb3JlZGlzIgogICAgICAgICAgICAgICAgaWRHZW5lcmF0b3IgPSBjb21wb25lbnQgIlVuaXF1ZSBJRCBHZW5lcmF0b3IiICJVVUlEIElEIGdlbmVyYXRvciBmb3IgZWFjaCBtZXNzYWdlLiIgInV1aWQ0IgogICAgICAgICAgICAgICAgY2FjaGVNYW5hZ2VyID0gY29tcG9uZW50ICJDYWNoZSBNYW5hZ2VyIiAiUmVhZHMgYW5kIHdyaXRlcyB0byBjYWNoZS4iICJpb3JlZGlzIgogICAgICAgICAgICAgICAgZGJDbGllbnQgPSBjb21wb25lbnQgIkRhdGFiYXNlIENsaWVudCIgIldyaXRlcyBtZXNzYWdlcyB0byBkYXRhYmFzZS4iICJjYXNzYW5kcmEtZHJpdmVyIgogICAgICAgICAgICAgICAgZXZlbnRQdWJsaXNoZXIgPSBjb21wb25lbnQgIkV2ZW50IFB1Ymxpc2hlciIgIkFkZHMgbWVzc2FnZXMgdG8gYnJva2VyIGFib3V0IGVhY2ggbWVzc2FnZSAtIHRvIG5vdGlmeSByZWNpcGllbnQgdXNlci4iICJyYWJiaXRtcS1jbGllbnQiCiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgICMgLS0tIFJlbGF0aW9uc2hpcHM6IEMxIENvbnRleHQgLS0tCiAgICAgICAgdWRheSAtPiB3aGF0c2FwcCAiTG9ncyBpbiBhbmQgbWFpbnRhaW5zIGFjdGl2ZSBjb25uZWN0aW9uIiAiSFRUUFMgKyBXZWJTb2NrZXQiCiAgICAgICAgc2FtIC0+IHdoYXRzYXBwICJMb2dzIGluIGFuZCBtYWludGFpbnMgYWN0aXZlIGNvbm5lY3Rpb24iICJIVFRQUyArIFdlYlNvY2tldCIKICAgICAgICB3aGF0c2FwcCAtPiBleHRlcm5hbFNtcyAiTWFrZXMgQVBJIGNhbGxzIHRvIHRyaWdnZXIgU01TIiAiSFRUUFMiCgogICAgICAgICMgLS0tIFJlbGF0aW9uc2hpcHM6IEMyIENvbnRhaW5lciAtLS0KICAgICAgICBtb2JpbGVBcHAgLT4gYXBpR2F0ZXdheSAiU2VuZHMgQVBJIGNhbGxzICsgV2Vic29ja2V0IGNvbm5lY3Rpb24gcmVxdWVzdHMiICJIVFRQUyArIFdlYlNvY2tldCIKICAgICAgICAKICAgICAgICBhcGlHYXRld2F5IC0+IHVzZXJTZXJ2aWNlICJNYWtlcyBBUEkgY2FsbHMiICJIVFRQUyIKICAgICAgICBhcGlHYXRld2F5IC0+IGNoYXRTZXJ2aWNlICJNYWtlcyBBUEkgY2FsbHMgKyBXZWJzb2NrZXQgY29ubmVjdGlvbiByZXF1ZXN0cyIgIkhUVFBTICsgV2ViU29ja2V0IgogICAgICAgIAogICAgICAgICMgVXNlciBTZXJ2aWNlIEZsb3cKICAgICAgICB1c2VyU2VydmljZSAtPiB1c2VyRGIgIk1ha2VzIEFQSSBjYWxscyIgIkhUVFBTIgogICAgICAgIHVzZXJTZXJ2aWNlIC0+IGludGVybmFsU21zU2VydmljZSAiTWFrZXMgQVBJIGNhbGxzIiAiSFRUUFMiCiAgICAgICAgCiAgICAgICAgIyBDaGF0IFNlcnZpY2UgRmxvdwogICAgICAgIGNoYXRTZXJ2aWNlIC0+IHJlZGlzQ2x1c3RlciAiTWFrZXMgQVBJIGNhbGxzIiAiSFRUUFMiCiAgICAgICAgY2hhdFNlcnZpY2UgLT4gY2hhdERiICJNYWtlcyBBUEkgY2FsbHMiICJIVFRQUyIKICAgICAgICBjaGF0U2VydmljZSAtPiBtZXNzYWdlQnJva2VyICJTZW5kcyBtZXNzYWdlcyBmb3IgZXZlbnRzIiAiQU1RUCIKICAgICAgICAKICAgICAgICAjIE5vdGlmaWNhdGlvbiBGbG93CiAgICAgICAgbWVzc2FnZUJyb2tlciAtPiBub3RpZmljYXRpb25TZXJ2aWNlICJGb3J3YXJkcyBtZXNzYWdlcyBmb3IgcHJvY2Vzc2luZyIgIkFNUVAiCiAgICAgICAgbm90aWZpY2F0aW9uU2VydmljZSAtPiBub3RpZkRiICJNYWtlcyBBUEkgY2FsbHMiICJIVFRQUyIKICAgICAgICBub3RpZmljYXRpb25TZXJ2aWNlIC0+IG1vYmlsZUFwcCAiU2VuZHMgcHVzaCBub3RpZmljYXRpb25zIiAiV2ViU29ja2V0L0FQTlMiCgogICAgICAgICMgSW50ZXJuYWwgU01TIEZsb3cKICAgICAgICBpbnRlcm5hbFNtc1NlcnZpY2UgLT4gc21zQ2FjaGUgIk1ha2VzIEFQSSBjYWxscyIgIkhUVFBTIgogICAgICAgIGludGVybmFsU21zU2VydmljZSAtPiBleHRlcm5hbFNtcyAiTWFrZXMgQVBJIGNhbGxzIiAiSFRUUFMiCiAgICB9CgogICAgdmlld3MgewogICAgICAgIHN5c3RlbUNvbnRleHQgd2hhdHNhcHAgIkNvbnRleHQiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9MYXlvdXQgdGIKICAgICAgICB9CgogICAgICAgIGNvbnRhaW5lciB3aGF0c2FwcCAiQ29udGFpbmVycyIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICB9CgogICAgICAgIHN0eWxlcyB7CiAgICAgICAgICAgIGVsZW1lbnQgIlBlcnNvbiIgewogICAgICAgICAgICAgICAgc2hhcGUgUGVyc29uCiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICM5YWNjZWMKICAgICAgICAgICAgICAgIGNvbG9yICMwMDAwMDAKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJTb2Z0d2FyZSBTeXN0ZW0iIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzdjYmZlYQogICAgICAgICAgICAgICAgY29sb3IgIzAwMDAwMAogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkNvbnRhaW5lciIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMTE2OGJkCiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiRGF0YWJhc2UiIHsKICAgICAgICAgICAgICAgIHNoYXBlIEN5bGluZGVyCiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICMxMTY4YmQKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJRdWV1ZSIgewogICAgICAgICAgICAgICAgc2hhcGUgUGlwZQogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMTE2OGJkCiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiTW9iaWxlIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBNb2JpbGVEZXZpY2VMYW5kc2NhcGUKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzExNjhiZAogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkV4dGVybmFsIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICM4ODg4ODgKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJDb21wb25lbnQiIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzJBNzZBOAogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQp9"
+  },
+  "views" : {
+    "configuration" : {
+      "branding" : { },
+      "lastSavedView" : "Containers",
+      "metadataSymbols" : "SquareBrackets",
+      "styles" : {
+        "elements" : [ {
+          "background" : "#2a76a8",
+          "color" : "#ffffff",
+          "tag" : "Component"
+        }, {
+          "background" : "#1168bd",
+          "color" : "#ffffff",
+          "tag" : "Container"
+        }, {
+          "background" : "#1168bd",
+          "color" : "#ffffff",
+          "shape" : "Cylinder",
+          "tag" : "Database"
+        }, {
+          "background" : "#888888",
+          "color" : "#ffffff",
+          "tag" : "External"
+        }, {
+          "background" : "#1168bd",
+          "color" : "#ffffff",
+          "shape" : "MobileDeviceLandscape",
+          "tag" : "Mobile"
+        }, {
+          "background" : "#9accec",
+          "color" : "#000000",
+          "shape" : "Person",
+          "tag" : "Person"
+        }, {
+          "background" : "#1168bd",
+          "color" : "#ffffff",
+          "shape" : "Pipe",
+          "tag" : "Queue"
+        }, {
+          "background" : "#7cbfea",
+          "color" : "#000000",
+          "tag" : "Software System"
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "dimensions" : {
+        "height" : 3800,
+        "width" : 4540
+      },
+      "elements" : [ {
+        "id" : "3",
+        "x" : 3655,
+        "y" : 3295
+      }, {
+        "id" : "5",
+        "x" : 312,
+        "y" : 132
+      }, {
+        "id" : "6",
+        "x" : 1167,
+        "y" : 1102
+      }, {
+        "id" : "7",
+        "x" : 2282,
+        "y" : 2612
+      }, {
+        "id" : "8",
+        "x" : 2570,
+        "y" : 1135
+      }, {
+        "id" : "9",
+        "x" : 3767,
+        "y" : 977
+      }, {
+        "id" : "10",
+        "x" : 2000,
+        "y" : 1130
+      }, {
+        "id" : "11",
+        "x" : 3062,
+        "y" : 2627
+      }, {
+        "id" : "12",
+        "x" : 3077,
+        "y" : 402
+      }, {
+        "id" : "13",
+        "x" : 2277,
+        "y" : 2017
+      }, {
+        "id" : "14",
+        "x" : 3777,
+        "y" : 397
+      }, {
+        "id" : "15",
+        "x" : 3082,
+        "y" : 2037
+      }, {
+        "id" : "16",
+        "x" : 2297,
+        "y" : 412
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "Containers",
+      "name" : "Container View: WhatsApp",
+      "order" : 2,
+      "relationships" : [ {
+        "id" : "26"
+      }, {
+        "id" : "27"
+      }, {
+        "id" : "28",
+        "vertices" : [ {
+          "x" : 2007,
+          "y" : 862
+        }, {
+          "x" : 2192,
+          "y" : 742
+        } ]
+      }, {
+        "id" : "29"
+      }, {
+        "id" : "30"
+      }, {
+        "id" : "31"
+      }, {
+        "id" : "32"
+      }, {
+        "id" : "33"
+      }, {
+        "id" : "34"
+      }, {
+        "id" : "35"
+      }, {
+        "id" : "36",
+        "vertices" : [ {
+          "x" : 4002,
+          "y" : 272
+        }, {
+          "x" : 922,
+          "y" : 282
+        } ]
+      }, {
+        "id" : "37"
+      }, {
+        "id" : "38",
+        "vertices" : [ {
+          "x" : 3870,
+          "y" : 2185
+        } ]
+      } ],
+      "softwareSystemId" : "4"
+    } ],
+    "systemContextViews" : [ {
+      "automaticLayout" : {
+        "applied" : true,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "TopBottom",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "dimensions" : {
+        "height" : 2000,
+        "width" : 1500
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 200,
+        "y" : 160
+      }, {
+        "id" : "2",
+        "x" : 900,
+        "y" : 160
+      }, {
+        "id" : "3",
+        "x" : 525,
+        "y" : 1460
+      }, {
+        "id" : "4",
+        "x" : 525,
+        "y" : 860
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "Context",
+      "name" : "System Context View: WhatsApp",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "23"
+      }, {
+        "id" : "24"
+      }, {
+        "id" : "25"
+      } ],
+      "softwareSystemId" : "4"
+    } ]
+  }
+}
