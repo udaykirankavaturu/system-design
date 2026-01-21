@@ -4,7 +4,7 @@
   "documentation" : { },
   "id" : 1,
   "lastModifiedAgent" : "structurizr-ui",
-  "lastModifiedDate" : "2026-01-21T02:37:05Z",
+  "lastModifiedDate" : "2026-01-21T02:43:32Z",
   "model" : {
     "deploymentNodes" : [ {
       "description" : "Route53 / Cloudflare",
@@ -87,7 +87,7 @@
         "instances" : "1",
         "name" : "Load Balancer Layer",
         "properties" : {
-          "structurizr.dsl.identifier" : "24a63a52-420b-4edb-a32e-6be94acf2130"
+          "structurizr.dsl.identifier" : "1dcf7087-1343-4726-b4b1-513379b002f2"
         },
         "tags" : "Element,Deployment Node"
       }, {
@@ -171,7 +171,7 @@
         "instances" : "1",
         "name" : "Kubernetes Cluster",
         "properties" : {
-          "structurizr.dsl.identifier" : "7d38e074-cc0d-4ce7-808e-e5299419ab1b"
+          "structurizr.dsl.identifier" : "b3eff3c9-bc60-4bba-b753-8fb39c422691"
         },
         "tags" : "Element,Deployment Node"
       }, {
@@ -226,7 +226,7 @@
         "instances" : "1",
         "name" : "Data Layer",
         "properties" : {
-          "structurizr.dsl.identifier" : "f3e4b4f2-eb6a-4daf-914f-03a13b911182"
+          "structurizr.dsl.identifier" : "ab6ab579-fb34-45f4-8ac1-fa492af0dd49"
         },
         "tags" : "Element,Deployment Node"
       } ],
@@ -287,7 +287,7 @@
         "instances" : "1",
         "name" : "Load Balancer Layer",
         "properties" : {
-          "structurizr.dsl.identifier" : "97dc4dca-b419-4c1c-b57c-ca5df2b9e2a2"
+          "structurizr.dsl.identifier" : "0f56ec41-bd59-419e-b95b-60880f20218b"
         },
         "tags" : "Element,Deployment Node"
       }, {
@@ -371,7 +371,7 @@
         "instances" : "1",
         "name" : "Kubernetes Cluster",
         "properties" : {
-          "structurizr.dsl.identifier" : "844a4959-50ca-479e-b989-cf9b4829cc19"
+          "structurizr.dsl.identifier" : "a4280789-130f-4efc-b8d3-74d075b2959d"
         },
         "tags" : "Element,Deployment Node"
       }, {
@@ -426,7 +426,7 @@
         "instances" : "1",
         "name" : "Data Layer",
         "properties" : {
-          "structurizr.dsl.identifier" : "81ca8d92-5f20-42fc-8e45-899250f17ce9"
+          "structurizr.dsl.identifier" : "7928ad67-48c1-4a53-81fc-378924fc0863"
         },
         "tags" : "Element,Deployment Node"
       } ],
@@ -965,7 +965,7 @@
         "y" : 175
       }, {
         "id" : "40",
-        "x" : 219,
+        "x" : 220,
         "y" : 1474
       }, {
         "id" : "41",
@@ -977,7 +977,7 @@
         "y" : 175
       }, {
         "id" : "43",
-        "x" : 1015,
+        "x" : 1016,
         "y" : 799
       }, {
         "id" : "44",
@@ -985,15 +985,15 @@
         "y" : 175
       }, {
         "id" : "45",
-        "x" : 1765,
+        "x" : 1766,
         "y" : 199
       }, {
         "id" : "47",
-        "x" : 1765,
+        "x" : 1766,
         "y" : 799
       }, {
         "id" : "49",
-        "x" : 1765,
+        "x" : 1766,
         "y" : 1399
       }, {
         "id" : "50",
@@ -1001,15 +1001,15 @@
         "y" : 175
       }, {
         "id" : "51",
-        "x" : 2515,
+        "x" : 2516,
         "y" : 799
       }, {
         "id" : "53",
-        "x" : 2515,
+        "x" : 2516,
         "y" : 1399
       }, {
         "id" : "56",
-        "x" : 2515,
+        "x" : 2516,
         "y" : 199
       }, {
         "id" : "58",
@@ -1021,7 +1021,7 @@
         "y" : 175
       }, {
         "id" : "60",
-        "x" : 1015,
+        "x" : 1016,
         "y" : 2149
       }, {
         "id" : "63",
@@ -1029,15 +1029,15 @@
         "y" : 175
       }, {
         "id" : "64",
-        "x" : 1765,
+        "x" : 1766,
         "y" : 2149
       }, {
         "id" : "70",
-        "x" : 1765,
+        "x" : 1766,
         "y" : 2749
       }, {
         "id" : "73",
-        "x" : 1765,
+        "x" : 1766,
         "y" : 3349
       }, {
         "id" : "75",
@@ -1045,15 +1045,15 @@
         "y" : 175
       }, {
         "id" : "76",
-        "x" : 2515,
+        "x" : 2516,
         "y" : 2749
       }, {
         "id" : "79",
-        "x" : 2515,
+        "x" : 2516,
         "y" : 3349
       }, {
         "id" : "84",
-        "x" : 2515,
+        "x" : 2516,
         "y" : 2149
       } ],
       "environment" : "Production",
@@ -1069,10 +1069,10 @@
       }, {
         "id" : "54",
         "vertices" : [ {
-          "x" : 2319,
+          "x" : 2320,
           "y" : 649
         }, {
-          "x" : 2410,
+          "x" : 2411,
           "y" : 1249
         } ]
       }, {
@@ -1088,10 +1088,10 @@
       }, {
         "id" : "82",
         "vertices" : [ {
-          "x" : 2319,
+          "x" : 2320,
           "y" : 2599
         }, {
-          "x" : 2410,
+          "x" : 2411,
           "y" : 3199
         } ]
       }, {
@@ -1107,7 +1107,7 @@
     } ],
     "systemContextViews" : [ {
       "automaticLayout" : {
-        "applied" : true,
+        "applied" : false,
         "edgeSeparation" : 0,
         "implementation" : "Graphviz",
         "nodeSeparation" : 300,
@@ -1115,26 +1115,22 @@
         "rankSeparation" : 300,
         "vertices" : false
       },
-      "dimensions" : {
-        "height" : 2000,
-        "width" : 1500
-      },
       "elements" : [ {
         "id" : "1",
-        "x" : 200,
-        "y" : 160
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "2",
-        "x" : 900,
-        "y" : 160
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "3",
-        "x" : 525,
-        "y" : 1460
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "4",
-        "x" : 525,
-        "y" : 860
+        "x" : 0,
+        "y" : 0
       } ],
       "enterpriseBoundaryVisible" : true,
       "key" : "Context",
