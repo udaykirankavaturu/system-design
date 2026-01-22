@@ -79,6 +79,10 @@ whatsapp is a communicator app - it includes 1:1 messaging, group chats, 1:1 cal
 
 ![Diagram](./assets/deployment.png)
 
+# Workflow
+
+![Diagram](./assets/multi-region.png)
+
 # To show user online/offline status
 
 - use websocket ping pong
