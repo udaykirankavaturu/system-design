@@ -3,8 +3,9 @@
 This is a design document of a ChatGPT system - a chatbot service that interacts with a large language model (LLM) to provide answers to user's prompts.
 
 # Functional Requirements
+
 ## In Scope
-- user should be able to register and login to use the system
+
 - provide a user interface for the user to enter prompts
 - user should be able to switch between supported LLMs
 - LLM should respond to user's prompt
@@ -12,9 +13,12 @@ This is a design document of a ChatGPT system - a chatbot service that interacts
 - user should be able to switch between conversations
 
 ## Out of Scope
+
+- registration and authentication
 - file attachments
 - subscriptions
 - archiving
+- agents
 
 # Non Functional Requirements
 
@@ -27,4 +31,3 @@ This is a design document of a ChatGPT system - a chatbot service that interacts
 - consistency - eventual
 - extensibility - system should be able to support newer models
 - observability - system should guard users from malicious, inappropriate responses from the LLMs
-
