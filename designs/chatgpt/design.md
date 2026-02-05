@@ -31,3 +31,31 @@ This is a design document of a ChatGPT system - a chatbot service that interacts
 - consistency - eventual
 - extensibility - system should be able to support newer models
 - observability - system should guard users from malicious, inappropriate responses from the LLMs
+
+# Actors Actions
+
+![actors actions](./assets/actors-actions.png)
+
+# Workflow
+
+![workflow](./assets/workflow.png)
+
+# Observability Workflow
+
+![observability workflow](./assets/observability-workflow.png)
+
+# Components
+
+![components](./assets/components.png)
+
+# Characteristics
+
+![characteristics](./assets/characteristics.png)
+
+# Quanta
+
+![quanta](./assets/quanta.png)
+
+# Architecture Styles
+
+![architecture styles](./assets/architectural-styles.png)
