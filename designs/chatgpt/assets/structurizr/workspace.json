@@ -1,0 +1,226 @@
+{
+  "configuration" : {
+    "scope" : "SoftwareSystem"
+  },
+  "description" : "Description",
+  "documentation" : { },
+  "id" : 1,
+  "lastModifiedDate" : "2026-02-06T02:42:20Z",
+  "model" : {
+    "people" : [ {
+      "id" : "1",
+      "name" : "User",
+      "properties" : {
+        "structurizr.dsl.identifier" : "user"
+      },
+      "relationships" : [ {
+        "description" : "Uses for chat conversations with LLMs",
+        "destinationId" : "2",
+        "id" : "8",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Uses for chat conversations with LLMs",
+        "destinationId" : "3",
+        "id" : "9",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "containers" : [ {
+        "description" : "Orchestrates prompt lifecycle",
+        "documentation" : { },
+        "id" : "3",
+        "name" : "Web Server",
+        "properties" : {
+          "structurizr.dsl.identifier" : "chatgptSystem.webServer"
+        },
+        "relationships" : [ {
+          "description" : "Reads from and writes to",
+          "destinationId" : "4",
+          "id" : "10",
+          "sourceId" : "3",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses for toxicity / PII sanity checks",
+          "destinationId" : "5",
+          "id" : "11",
+          "sourceId" : "3",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Sends and receives prompts from",
+          "destinationId" : "6",
+          "id" : "12",
+          "sourceId" : "3",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses for prompt tracing, monitoring and alerting",
+          "destinationId" : "7",
+          "id" : "13",
+          "sourceId" : "3",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "FastAPI"
+      }, {
+        "description" : "Stores chat conversations and metadata",
+        "documentation" : { },
+        "id" : "4",
+        "name" : "SQL Database",
+        "properties" : {
+          "structurizr.dsl.identifier" : "chatgptSystem.sqlDatabase"
+        },
+        "tags" : "Element,Container",
+        "technology" : "PostgreSQL"
+      }, {
+        "description" : "Small LLM fine tuned on guard railing",
+        "documentation" : { },
+        "id" : "5",
+        "name" : "Guard Middleware LLM",
+        "properties" : {
+          "structurizr.dsl.identifier" : "chatgptSystem.guardMiddleware"
+        },
+        "tags" : "Element,Container",
+        "technology" : "meta-llama/Llama-Guard-3-8B"
+      }, {
+        "description" : "Multiple models with different purposes",
+        "documentation" : { },
+        "id" : "6",
+        "name" : "LLMs",
+        "properties" : {
+          "structurizr.dsl.identifier" : "chatgptSystem.LLM"
+        },
+        "tags" : "Element,Container",
+        "technology" : "OpenAI Models"
+      }, {
+        "description" : "Traces each prompt lifecycle and raises alerts on violations",
+        "documentation" : { },
+        "id" : "7",
+        "name" : "LLM Evaluator",
+        "properties" : {
+          "structurizr.dsl.identifier" : "chatgptSystem.LLMEvaluator"
+        },
+        "tags" : "Element,Container",
+        "technology" : "Langfuse"
+      } ],
+      "documentation" : { },
+      "id" : "2",
+      "name" : "ChatGPT System",
+      "properties" : {
+        "structurizr.dsl.identifier" : "chatgptSystem"
+      },
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "Name",
+  "properties" : {
+    "structurizr.inspection.error" : "10",
+    "structurizr.dsl" : "d29ya3NwYWNlICJOYW1lIiAiRGVzY3JpcHRpb24iIHsKCiAgICAhaWRlbnRpZmllcnMgaGllcmFyY2hpY2FsCgogICAgbW9kZWwgewogICAgICAgIHVzZXIgPSBwZXJzb24gIlVzZXIiCiAgICAgICAgY2hhdGdwdFN5c3RlbSA9IHNvZnR3YXJlU3lzdGVtICJDaGF0R1BUIFN5c3RlbSIgewogICAgICAgICAgICB3ZWJTZXJ2ZXIgPSBjb250YWluZXIgIldlYiBTZXJ2ZXIiIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJPcmNoZXN0cmF0ZXMgcHJvbXB0IGxpZmVjeWNsZSIKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkZhc3RBUEkiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgc3FsRGF0YWJhc2UgPSBjb250YWluZXIgIlNRTCBEYXRhYmFzZSIgewogICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlN0b3JlcyBjaGF0IGNvbnZlcnNhdGlvbnMgYW5kIG1ldGFkYXRhIgogICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiUG9zdGdyZVNRTCIKICAgICAgICAgICAgfQogICAgICAgICAgICBndWFyZE1pZGRsZXdhcmUgPSBjb250YWluZXIgIkd1YXJkIE1pZGRsZXdhcmUgTExNIiB7CiAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiU21hbGwgTExNIGZpbmUgdHVuZWQgb24gZ3VhcmQgcmFpbGluZyIKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIm1ldGEtbGxhbWEvTGxhbWEtR3VhcmQtMy04QiIKICAgICAgICAgICAgfQogICAgICAgICAgICBMTE0gPSBjb250YWluZXIgIkxMTXMiIHsKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIk9wZW5BSSBNb2RlbHMiCiAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiTXVsdGlwbGUgbW9kZWxzIHdpdGggZGlmZmVyZW50IHB1cnBvc2VzIgogICAgICAgICAgICB9CiAgICAgICAgICAgIExMTUV2YWx1YXRvciA9IGNvbnRhaW5lciAiTExNIEV2YWx1YXRvciIgewogICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlRyYWNlcyBlYWNoIHByb21wdCBsaWZlY3ljbGUgYW5kIHJhaXNlcyBhbGVydHMgb24gdmlvbGF0aW9ucyIKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkxhbmdmdXNlIgogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICB1c2VyIC0+IGNoYXRncHRTeXN0ZW0gIlVzZXMgZm9yIGNoYXQgY29udmVyc2F0aW9ucyB3aXRoIExMTXMiCiAgICAgICAgdXNlciAtPiBjaGF0Z3B0U3lzdGVtLndlYlNlcnZlciAiVXNlcyBmb3IgY2hhdCBjb252ZXJzYXRpb25zIHdpdGggTExNcyIKICAgICAgICBjaGF0Z3B0U3lzdGVtLndlYlNlcnZlciAtPiBjaGF0Z3B0U3lzdGVtLnNxbERhdGFiYXNlICJSZWFkcyBmcm9tIGFuZCB3cml0ZXMgdG8iCiAgICAgICAgY2hhdGdwdFN5c3RlbS53ZWJTZXJ2ZXIgLT4gY2hhdGdwdFN5c3RlbS5ndWFyZE1pZGRsZXdhcmUgIlVzZXMgZm9yIHRveGljaXR5IC8gUElJIHNhbml0eSBjaGVja3MiCiAgICAgICAgY2hhdGdwdFN5c3RlbS53ZWJTZXJ2ZXIgLT4gY2hhdGdwdFN5c3RlbS5MTE0gIlNlbmRzIGFuZCByZWNlaXZlcyBwcm9tcHRzIGZyb20iCiAgICAgICAgY2hhdGdwdFN5c3RlbS53ZWJTZXJ2ZXIgLT4gY2hhdGdwdFN5c3RlbS5MTE1FdmFsdWF0b3IgIlVzZXMgZm9yIHByb21wdCB0cmFjaW5nLCBtb25pdG9yaW5nIGFuZCBhbGVydGluZyIKICAgIH0KCiAgICB2aWV3cyB7CiAgICAgICAgc3lzdGVtQ29udGV4dCBjaGF0Z3B0U3lzdGVtICJDb250ZXh0RGlhZ3JhbSIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICB9CgogICAgICAgIGNvbnRhaW5lciBjaGF0Z3B0U3lzdGVtICJDb250YWluZXJEaWFncmFtIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgIH0KCiAgICAgICAgc3R5bGVzIHsKICAgICAgICAgICAgZWxlbWVudCAiRWxlbWVudCIgewogICAgICAgICAgICAgICAgY29sb3IgIzU1YWE1NQogICAgICAgICAgICAgICAgc3Ryb2tlICM1NWFhNTUKICAgICAgICAgICAgICAgIHN0cm9rZVdpZHRoIDcKICAgICAgICAgICAgICAgIHNoYXBlIHJvdW5kZWRib3gKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJQZXJzb24iIHsKICAgICAgICAgICAgICAgIHNoYXBlIHBlcnNvbgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkRhdGFiYXNlIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBjeWxpbmRlcgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBzdHJva2VXaWR0aCA1CiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmVsYXRpb25zaGlwICJSZWxhdGlvbnNoaXAiIHsKICAgICAgICAgICAgICAgIHRoaWNrbmVzcyA0CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9CgogICAgY29uZmlndXJhdGlvbiB7CiAgICAgICAgc2NvcGUgc29mdHdhcmVzeXN0ZW0KICAgIH0KCn0=",
+    "structurizr.inspection.info" : "0",
+    "structurizr.inspection.ignore" : "0",
+    "structurizr.inspection.warning" : "0"
+  },
+  "views" : {
+    "configuration" : {
+      "branding" : { },
+      "lastSavedView" : "ContainerDiagram",
+      "styles" : {
+        "elements" : [ {
+          "strokeWidth" : 5,
+          "tag" : "Boundary"
+        }, {
+          "shape" : "Cylinder",
+          "tag" : "Database"
+        }, {
+          "color" : "#55aa55",
+          "shape" : "RoundedBox",
+          "stroke" : "#55aa55",
+          "strokeWidth" : 7,
+          "tag" : "Element"
+        }, {
+          "shape" : "Person",
+          "tag" : "Person"
+        } ],
+        "relationships" : [ {
+          "tag" : "Relationship",
+          "thickness" : 4
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "dimensions" : {
+        "height" : 2120,
+        "width" : 3358
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 1479,
+        "y" : 208
+      }, {
+        "id" : "3",
+        "x" : 1454,
+        "y" : 908
+      }, {
+        "id" : "4",
+        "x" : 329,
+        "y" : 1508
+      }, {
+        "id" : "5",
+        "x" : 1079,
+        "y" : 1508
+      }, {
+        "id" : "6",
+        "x" : 1829,
+        "y" : 1508
+      }, {
+        "id" : "7",
+        "x" : 2579,
+        "y" : 1508
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "ContainerDiagram",
+      "name" : "Container View: ChatGPT System",
+      "order" : 2,
+      "paperSize" : "A4_Landscape",
+      "relationships" : [ {
+        "id" : "10"
+      }, {
+        "id" : "11"
+      }, {
+        "id" : "12"
+      }, {
+        "id" : "13"
+      }, {
+        "id" : "9"
+      } ],
+      "softwareSystemId" : "2"
+    } ],
+    "systemContextViews" : [ {
+      "dimensions" : {
+        "height" : 1416,
+        "width" : 866
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 233,
+        "y" : 208
+      }, {
+        "id" : "2",
+        "x" : 208,
+        "y" : 908
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "ContextDiagram",
+      "name" : "System Context View: ChatGPT System",
+      "order" : 1,
+      "paperSize" : "A6_Portrait",
+      "relationships" : [ {
+        "id" : "8"
+      } ],
+      "softwareSystemId" : "2"
+    } ]
+  }
+}
