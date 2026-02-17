@@ -25,8 +25,8 @@ This is a design document of a ChatGPT system - a chatbot service that interacts
 - latency - low for the interface, variable for prompt response
 - scale
   - DAU - 100 million users
-  - QPS - 10 million
-- availability - 99.9%
+  - QPS - 1 million
+- availability - 99.99%
 - durability - conversations should not be lost
 - consistency - eventual
 - extensibility - system should be able to support newer models
@@ -75,14 +75,14 @@ This is a design document of a ChatGPT system - a chatbot service that interacts
   Add redis for session management.
 
 - data store
-  Use one or two writer databases with mutiple reader databases. Solves for eventual consistency and latency. Position read databases across the globe - users can query from nearest database. Can apply sharding techniques by user location later on.
+  Use one or two writer databases with mutiple reader databases. Solves for eventual consistency and better latency. Position read databases across the globe - users can query from nearest database. Can apply sharding techniques by user location later on.
 
 - guard middleware
   Use edge deployment such as lambda functions that can serve users based on location.
   Apply semantic caching to reduce latency and number of pods needed to serve the scale.
 
 - llms
-  Apply rate limiting across models. Implement router in webserver to switch between models.
+  Apply rate limiting across models. Implement router in webserver to switch between models using service discovery techniques.
   Add a load balancer for each model in multiple pods.
 
 - llm observability
