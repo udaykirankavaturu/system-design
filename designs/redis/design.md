@@ -1,11 +1,21 @@
+---
+marp: true
+paginate: true
+theme: default
+---
+
 # System design for 'redis'
 
 Design a distributed key value store such as Redis.
 
+---
+
 # Functional Requirements
 
-- put(key, value) - insert 'value' associated with 'key'
-- get(key) - get 'value' associated with 'key'
+- `put(key, value)` - insert 'value' associated with 'key'
+- `get(key)` - get 'value' associated with 'key'
+
+---
 
 # Non Functional Requirements
 
@@ -16,6 +26,8 @@ Design a distributed key value store such as Redis.
 - Automatic scaling: The addition/deletion of servers should be automatic based on traffic.
 - Tunable consistency.
 - Low latency.
+
+---
 
 # Actors Actions
 
@@ -31,6 +43,8 @@ flowchart LR
     A[Server] -->|"get(1)"| B(Redis Node)
     B(Redis Node) -->|"football"| A[Server]
 ```
+
+---
 
 # Event Storming
 
@@ -53,6 +67,8 @@ flowchart LR
     style C fill:#cce5ff,stroke:#004085,stroke-width:2px,color:#000
 ```
 
+---
+
 # Components
 
 ```mermaid
@@ -63,13 +79,17 @@ graph TD
     end
 ```
 
+---
+
 # Characteristics
 
-![Characteristics](./assets/characteristics.png)
+![bg right:60% fit](./assets/characteristics.png)
 
-# Components revisited for performance
+System characteristics and architectural trade-offs.
 
-## Write flow
+---
+
+# Components revisited for performance: Write flow
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -99,10 +119,11 @@ graph LR
     end
 ```
 
-## Read flow
+---
+
+# Components revisited for performance: Read flow
 
 ```mermaid
-%%{init: {'theme': 'forest'}}%%
 %%{init: {'theme': 'forest'}}%%
 graph LR
     subgraph ClientBlock["Client"]
@@ -121,7 +142,7 @@ graph LR
 
         subgraph DISK["DISK"]
             direction LR
-            %% BloomFilter["Bloom filter"] --> SSTables["SSTables"]
+            BloomFilter["Bloom filter"] --> SSTables["SSTables"]
         end
 
         Coordinator -->|"(1) Check memory"| MemoryCache
@@ -134,6 +155,8 @@ graph LR
     Coordinator -.->|"(6) Return result"| Client
 ```
 
+---
+
 # Components revisited for scalability
 
 ## Data partitioning using consistent hashing
@@ -141,7 +164,9 @@ graph LR
 - Distribute data evenly
 - Minimize data movement when adding or removing nodes.
 
-### Consistent hashing concept
+---
+
+# Consistent hashing concept
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -161,7 +186,9 @@ graph LR
     end
 ```
 
-### Data partioning example
+---
+
+# Data partitioning example
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -189,9 +216,9 @@ graph TD
     end
 ```
 
-# Components revisited for high availability
+---
 
-## CAP Theorem
+# Components revisited for high availability: CAP Theorem
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -211,7 +238,9 @@ graph TD
     C & A --> CA["<b>CA Systems</b><br/><i>No Partition Tolerance (Not realistic for distributed networks)</i><br/>• Single-node or non-partitioned setups<br/>• Examples: Traditional RDBMS (PostgreSQL, MySQL)"]
 ```
 
-## Data replication and data consistency
+---
+
+# Data replication and data consistency
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -239,7 +268,9 @@ graph TD
     end
 ```
 
-## Data inconsistency handling
+---
+
+# Data inconsistency handling
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -260,7 +291,9 @@ graph LR
     Conflict --> Resolve["<b>6. Client-Side Resolution</b><br/>Client merges 'v2' + 'v3' -> 'v4'<br/>Writes back via Sx:<br/><b>D4: [Sx, 2], [Sy, 1], [Sz, 1]</b>"]
 ```
 
-## Handling permanent failure
+---
+
+# Handling permanent failure
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -282,4 +315,46 @@ graph TD
     end
 
     Detection ==>|"Triggers rebalancing & background repair"| Sync
+```
+
+---
+
+# Overall System Architecture Design
+
+```mermaid
+%%{init: {'theme': 'forest'}}%%
+flowchart LR
+    Client["<b>Client App</b><br/><i>put(k, v) / get(k)</i>"] -->|"Request + Vector Clock"| LB["<b>Load Balancer / Smart Client</b>"]
+
+    LB --> Coord["<b>Coordinator Node</b><br/>• Consistent Hashing + Vnodes<br/>• Enforces Quorum (W + R > N)<br/>• Read Repair & Hinted Handoff"]
+
+    subgraph Cluster["Storage Cluster (Consistent Hash Ring, N=3 Replicas)"]
+        direction TB
+        N1["<b>Node A (Primary)</b><br/>Owns Range + Replicas"]
+        N2["<b>Node B (Replica 1)</b><br/>Owns Range + Replicas"]
+        N3["<b>Node C (Replica 2)</b><br/>Owns Range + Replicas"]
+
+        N1 <-->|"Gossip Heartbeats<br/>& Merkle Tree Sync"| N2
+        N2 <-->|"Gossip Heartbeats<br/>& Merkle Tree Sync"| N3
+        N1 <-->|"Gossip Heartbeats<br/>& Merkle Tree Sync"| N3
+    end
+
+    Coord -->|"Quorum Write / Read"| N1
+    Coord -->|"Quorum Write / Read"| N2
+    Coord -.->|"Async / Standby"| N3
+
+    subgraph Engine["Single-Node Storage Engine (Inside Each Node)"]
+        direction TB
+        WAL[("<b>Commit Log (Disk)</b><br/>Append-only durability")]
+        Mem["<b>Memtable (RAM)</b><br/>Fast sorted writes & reads"]
+        BF["<b>Bloom Filter (RAM)</b><br/>Skips missing disk lookups"]
+        SST[("<b>SSTables (Disk)</b><br/>Immutable sorted files")]
+
+        Mem -->|"Flush when full"| SST
+        BF -->|"Locates key"| SST
+    end
+
+    N1 ==>|"Local Persistence"| WAL
+    N1 ==>|"Local Read / Write"| Mem
+    N1 -.->|"Cache Miss Lookup"| BF
 ```
