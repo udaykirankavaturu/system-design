@@ -1,6 +1,6 @@
 # System design for 'redis'
 
-Design a distributed key value store such as Redis, Memcached.
+Design a distributed key value store such as Redis.
 
 # Functional Requirements
 
@@ -140,6 +140,28 @@ graph LR
 
 - Distribute data evenly
 - Minimize data movement when adding or removing nodes.
+
+### Consistent hashing concept
+
+```mermaid
+%%{init: {'theme': 'forest'}}%%
+graph LR
+    K0(["key0 (hashed position)"]) -.->|"walks clockwise to first server"| S1
+
+    subgraph Ring["Consistent Hash Ring (Clockwise Order: s0 -> s7 -> s0)"]
+        direction LR
+        S0(("s0")) --> S1(("s1"))
+        S1 --> S2(("s2"))
+        S2 --> S3(("s3"))
+        S3 --> S4(("s4"))
+        S4 --> S5(("s5"))
+        S5 --> S6(("s6"))
+        S6 --> S7(("s7"))
+        S7 -.->|"wraps around"| S0
+    end
+```
+
+### Data partioning example
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
