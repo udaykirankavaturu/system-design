@@ -34,13 +34,13 @@ Design a distributed key value store such as Redis.
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
 flowchart LR
-    A[Server] -->|"put(1,'football')"| B(Redis Node)
+    A[Client] -->|"put(1,'football')"| B(Redis Node)
 ```
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
 flowchart LR
-    A[Server] -->|"get(1)"| B(Redis Node)
+    A[Client] -->|"get(1)"| B(Redis Node)
     B(Redis Node) -->|"football"| A[Server]
 ```
 
@@ -84,8 +84,6 @@ graph TD
 # Characteristics
 
 ![bg right:60% fit](./assets/characteristics.png)
-
-System characteristics and architectural trade-offs.
 
 ---
 
